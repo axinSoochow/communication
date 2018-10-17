@@ -1,4 +1,4 @@
-package com.axin.communication.tools;
+package com.axin.communication.tools.common;
 
 import java.math.BigDecimal;
 
