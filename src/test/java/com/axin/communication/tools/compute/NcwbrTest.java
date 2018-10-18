@@ -6,7 +6,6 @@ import org.junit.Test;
 
 public class NcwbrTest {
 
-
     @Test
     public void getAveBandwidth() {
         double res = Ncwbr.getAveBandwidth(4, 5, 5, 0.2, 1);
