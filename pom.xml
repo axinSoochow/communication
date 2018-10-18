@@ -23,9 +23,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+        <java.version>1.8</java.version>
         <mybatis-spring-boot>1.2.0</mybatis-spring-boot>
         <mysql-connector>8.0.11</mysql-connector>
-        <java.version>1.8</java.version>
+        <jfreechart>1.0.13</jfreechart>
+        <jama>1.0.3</jama>
+
     </properties>
 
     <dependencies>
@@ -66,9 +69,15 @@
         <dependency>
             <groupId>jfree</groupId>
             <artifactId>jfreechart</artifactId>
-            <version>1.0.13</version>
+            <version>${jfreechart}</version>
         </dependency>
 
+        <!-- Java 线性代数运算工具 -->
+        <dependency>
+            <groupId>gov.nist.math</groupId>
+            <artifactId>jama</artifactId>
+            <version>${jama}</version>
+        </dependency>
     </dependencies>
 
 
