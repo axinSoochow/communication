@@ -3,7 +3,7 @@ package com.axin.communication.tools.compute;
 import com.axin.communication.tools.common.MatrixTools;
 import com.axin.communication.tools.common.NetworkCodeTools;
 
-import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,12 +36,18 @@ public class Ncwbr {
             restPacketNumber -= interval;
             //多播数据包得到MPEM矩阵
             MPEM = NetworkCodeTools.multicastProcess(restPacketNumber, number, interval, packetLoss);
+            MatrixTools.printMatrix(MPEM);
             //开始重传
             while (!MatrixTools.isZeroMatrix(MPEM)) {
                 //得到编码包
                 int[] codePacket = getCodePacket(MPEM);
+                System.out.println("得到编码包：");
+                System.out.println(Arrays.toString(codePacket));
                 reNumber++;
                 MPEM = NetworkCodeTools.decodeProcess(MPEM, codePacket, packetLoss, promote);
+                System.out.println("解码后:");
+                MatrixTools.printMatrix(MPEM);
+                System.out.println("共"+reNumber+"次");
             }
         }
         //精确计算保留两位小数
