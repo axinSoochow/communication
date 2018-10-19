@@ -1,7 +1,8 @@
-package com.axin.communication.tools.compute;
+package com.axin.communication.tools.algorithm;
 
 import com.axin.communication.tools.common.MatrixTools;
 import com.axin.communication.tools.common.NetworkCodeTools;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,7 +16,8 @@ import java.util.Set;
  * @author Axin
  * @date 18-10-17
  */
-public class Ncwbr {
+@Component("ncwbr")
+public class Ncwbr implements NetworkCode {
 
     /**
      *
@@ -26,7 +28,8 @@ public class Ncwbr {
      * @param promote 重传丢包率降低百分比
      * @return 传输带宽消耗（平均传输次数）
      */
-    public static double getAveBandwidth(int number,int packetNumber,int interval,double packetLoss,double promote) {
+    @Override
+    public double getAveBandwidth(int number, int packetNumber, int interval, double packetLoss, double promote) {
         //重传次数
         int reNumber = 0;
         //剩余传输包数
@@ -36,18 +39,12 @@ public class Ncwbr {
             restPacketNumber -= interval;
             //多播数据包得到MPEM矩阵
             MPEM = NetworkCodeTools.multicastProcess(restPacketNumber, number, interval, packetLoss);
-            MatrixTools.printMatrix(MPEM);
             //开始重传
             while (!MatrixTools.isZeroMatrix(MPEM)) {
                 //得到编码包
                 int[] codePacket = getCodePacket(MPEM);
-                System.out.println("得到编码包：");
-                System.out.println(Arrays.toString(codePacket));
                 reNumber++;
                 MPEM = NetworkCodeTools.decodeProcess(MPEM, codePacket, packetLoss, promote);
-                System.out.println("解码后:");
-                MatrixTools.printMatrix(MPEM);
-                System.out.println("共"+reNumber+"次");
             }
         }
         //精确计算保留两位小数
@@ -60,7 +57,8 @@ public class Ncwbr {
      * @param MPEM
      * @return 利用NCWBR方法获得编码数据包
      */
-    public static int[] getCodePacket(int[][] MPEM) {
+    @Override
+    public int[] getCodePacket(int[][] MPEM) {
         Set<Integer> codePacket = new HashSet<>();
         for (int i = 0; i < MPEM.length; i++) {
             for (int j = 0; j < MPEM[0].length; j++) {

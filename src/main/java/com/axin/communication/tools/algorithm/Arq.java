@@ -1,8 +1,8 @@
-package com.axin.communication.tools.compute;
-
+package com.axin.communication.tools.algorithm;
 
 import com.axin.communication.tools.common.MatrixTools;
 import com.axin.communication.tools.common.NetworkCodeTools;
+import org.springframework.stereotype.Component;
 
 /**
  * 传统的ARQ(Automatic Repeat Request)
@@ -10,7 +10,8 @@ import com.axin.communication.tools.common.NetworkCodeTools;
  * @author Axin
  * @date 18-10-17
  */
-public class Arq {
+@Component("arq")
+public class Arq implements NetworkCode{
     /**
      * @param number
      * @param packatNumber
@@ -19,7 +20,8 @@ public class Arq {
      * @param promote
      * @return arq的传输带宽消耗
      */
-    public static double getAveBandwidth(int number, int packatNumber, int interval, double packetLoss, double promote) {
+    @Override
+    public double getAveBandwidth(int number, int packatNumber, int interval, double packetLoss, double promote) {
         packetLoss = packetLoss > 0 ? packetLoss : 0;
         //重传次数
         int reNumber = 0;
@@ -46,7 +48,8 @@ public class Arq {
      * @param MPEM
      * @return
      */
-    public static int[] getCodePacket(int[][] MPEM) {
+    @Override
+    public int[] getCodePacket(int[][] MPEM) {
         for (int i = 0; i < MPEM.length; i++) {
             for (int j = 0; j < MPEM[0].length; j++) {
                 if (MPEM[i][j] == 1) {
