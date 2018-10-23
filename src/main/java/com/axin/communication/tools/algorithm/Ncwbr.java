@@ -4,7 +4,6 @@ import com.axin.communication.tools.common.MatrixTools;
 import com.axin.communication.tools.common.NetworkCodeTools;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,17 +16,8 @@ import java.util.Set;
  * @date 18-10-17
  */
 @Component("ncwbr")
-public class Ncwbr implements NetworkCode {
+    public class Ncwbr implements NetworkCode {
 
-    /**
-     *
-     * @param number 接收端个数
-     * @param packetNumber 传输数据包数量
-     * @param interval 重传时间间隔
-     * @param packetLoss 平均链接丢包率
-     * @param promote 重传丢包率降低百分比
-     * @return 传输带宽消耗（平均传输次数）
-     */
     @Override
     public double getAveBandwidth(int number, int packetNumber, int interval, double packetLoss, double promote) {
         //重传次数
