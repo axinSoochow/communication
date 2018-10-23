@@ -7,11 +7,11 @@ package com.axin.communication.domain;
  * @author Axin
  * @date 18-10-19
  */
-public class codeMap {
+public class CodeMap {
     private int code;
     private int index;
 
-    public codeMap(int code, int index) {
+    public CodeMap(int code, int index) {
         this.code = code;
         this.index = index;
     }
