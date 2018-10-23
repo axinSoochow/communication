@@ -1,8 +1,7 @@
 package com.axin.communication.tools.algorithm;
 
-import com.axin.communication.domain.codeMap;
+import com.axin.communication.domain.CodeMap;
 import com.axin.communication.tools.common.MatrixTools;
-import com.axin.communication.tools.common.NetworkCodeTools;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -23,26 +22,22 @@ public class Oncsb implements NetworkCode {
             return new int[0];
         }
         //map存放每列计算好的hash值
-        List<codeMap> map = new ArrayList<>();
-        Set<codeMap> codeResult = new HashSet<>();
+        List<CodeMap> map = new ArrayList<>();
+        Set<CodeMap> codeResult = new HashSet<>();
 
         int number = MPEM.length;
         //计算每列的hash值
         computeHashcode(MPEM, map);
 
         //取出第一个
-        codeMap first = map.get(0);
+        CodeMap first = map.get(0);
         codeResult.add(first);
         int fullCode = (int) Math.pow(2, number) - 1;
         int nowCode = first.getCode();
-        int index = 0;
+        int index = 1;
 
-        //如果存在有一列全1
-        if (nowCode == fullCode) {
-            return new int[]{first.getIndex()};
-        }
         while (nowCode != fullCode && index != map.size()) {
-            codeMap curCode = map.get(index);
+            CodeMap curCode = map.get(index);
             if (detection(curCode.getCode(), nowCode)) {
                 codeResult.add(curCode);
                 nowCode += curCode.getCode();
@@ -59,7 +54,7 @@ public class Oncsb implements NetworkCode {
      * @param MPEM
      * @param map
      */
-    private void computeHashcode(int[][] MPEM, List<codeMap> map) {
+    private void computeHashcode(int[][] MPEM, List<CodeMap> map) {
         int index = 0;
         //计算每列的hash值
         for (int i = 0; i < MPEM[0].length; i++) {
@@ -71,7 +66,7 @@ public class Oncsb implements NetworkCode {
             }
             //将hash值非零的列加入codeMap中
             if (code != 0) {
-                map.add(new codeMap(code, index));
+                map.add(new CodeMap(code, index));
             }
             index++;
         }
@@ -84,10 +79,10 @@ public class Oncsb implements NetworkCode {
      * @param code
      * @return
      */
-    private int[] transform(Set<codeMap> code) {
+    private int[] transform(Set<CodeMap> code) {
         int[] codePacket = new int[code.size()];
         int index = 0;
-        for (codeMap data : code) {
+        for (CodeMap data : code) {
             codePacket[index++] = data.getIndex();
         }
         return codePacket;
@@ -111,18 +106,11 @@ public class Oncsb implements NetworkCode {
     /**
      * codeMap的code从大到小排序
      */
-    private static class AxinComparator implements Comparator<codeMap> {
+    private static class AxinComparator implements Comparator<CodeMap> {
         @Override
-        public int compare(codeMap o1, codeMap o2) {
+        public int compare(CodeMap o1, CodeMap o2) {
             return o2.getCode() - o1.getCode();
         }
     }
-
-//    public static void main(String[] args) {
-//        int a = 8;
-//        int b =9;
-//        System.out.println("a异或b:"+(a^b));
-//        System.out.println("a同或b:"+~(a^b));
-//    }
 }
 

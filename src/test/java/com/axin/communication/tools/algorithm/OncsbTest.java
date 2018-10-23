@@ -5,11 +5,8 @@ import com.axin.communication.tools.common.MatrixTools;
 import com.axin.communication.tools.common.NetworkCodeTools;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.Arrays;
-
-import static org.junit.Assert.*;
 
 public class OncsbTest extends CommunicationApplicationTests {
     @Autowired
@@ -24,7 +21,8 @@ public class OncsbTest extends CommunicationApplicationTests {
     }
 
     @Test
-    public void computeHashcode() {
-
+    public void getBandWidth() {
+        double res = NetworkCodeTools.getBandwidth(oncsb,5,50,50,0.3,1);
+        System.out.println(res);
     }
 }

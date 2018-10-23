@@ -118,7 +118,7 @@ public class NetworkCodeTools {
      * @param promote
      * @return 传输带宽消耗
      */
-    public static double getAveBandwidth(NetworkCode networkCode, int number, int packetNumber, int interval, double packetLoss, double promote) {
+    public static double getBandwidth(NetworkCode networkCode, int number, int packetNumber, int interval, double packetLoss, double promote) {
         //重传次数
         int reNumber = 0;
         //剩余传输包数
