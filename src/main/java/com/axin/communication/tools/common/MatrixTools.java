@@ -1,6 +1,8 @@
 package com.axin.communication.tools.common;
 
 
+import com.axin.communication.tools.algorithm.NetworkCode;
+
 /**
  * 矩阵操作工具类
  * @author Axin
@@ -22,15 +24,17 @@ public class MatrixTools {
         }
         return true;
     }
+
     /**
      * 展示矩阵
+     *
      * @param MPEM
      */
     public static void printMatrix(int[][] MPEM) {
         System.out.println("矩阵展示：");
         for (int i = 0; i < MPEM.length; i++) {
             for (int j = 0; j < MPEM[0].length; j++) {
-                System.out.print(MPEM[i][j]+" ");
+                System.out.print(MPEM[i][j] + " ");
             }
             System.out.println();
         }

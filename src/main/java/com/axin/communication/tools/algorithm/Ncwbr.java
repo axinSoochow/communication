@@ -18,30 +18,6 @@ import java.util.Set;
 @Component("ncwbr")
     public class Ncwbr implements NetworkCode {
 
-    @Override
-    public double getAveBandwidth(int number, int packetNumber, int interval, double packetLoss, double promote) {
-        //重传次数
-        int reNumber = 0;
-        //剩余传输包数
-        int restPacketNumber = packetNumber;
-        int[][] MPEM;
-        while (restPacketNumber >0) {
-            restPacketNumber -= interval;
-            //多播数据包得到MPEM矩阵
-            MPEM = NetworkCodeTools.multicastProcess(restPacketNumber, number, interval, packetLoss);
-            //开始重传
-            while (!MatrixTools.isZeroMatrix(MPEM)) {
-                //得到编码包
-                int[] codePacket = getCodePacket(MPEM);
-                reNumber++;
-                MPEM = NetworkCodeTools.decodeProcess(MPEM, codePacket, packetLoss, promote);
-            }
-        }
-        //精确计算保留两位小数
-        double aveBandwidth = NetworkCodeTools.computeAveBandwidth(reNumber, packetNumber);
-
-        return aveBandwidth;
-    }
 
     /**
      * @param MPEM

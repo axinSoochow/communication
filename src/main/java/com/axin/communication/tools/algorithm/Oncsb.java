@@ -2,6 +2,7 @@ package com.axin.communication.tools.algorithm;
 
 import com.axin.communication.domain.codeMap;
 import com.axin.communication.tools.common.MatrixTools;
+import com.axin.communication.tools.common.NetworkCodeTools;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -15,13 +16,6 @@ import java.util.*;
  */
 @Component("oncsb")
 public class Oncsb implements NetworkCode {
-
-    @Override
-    public double getAveBandwidth(int number, int packetNumber, int interval, double packetLoss, double promote) {
-
-
-        return 0;
-    }
 
     @Override
     public int[] getCodePacket(int[][] MPEM) {

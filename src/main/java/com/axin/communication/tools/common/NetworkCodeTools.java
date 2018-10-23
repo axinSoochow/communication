@@ -1,5 +1,7 @@
 package com.axin.communication.tools.common;
 
+import com.axin.communication.tools.algorithm.NetworkCode;
+
 import java.math.BigDecimal;
 
 /**
@@ -103,5 +105,39 @@ public class NetworkCodeTools {
     public static double computeAveBandwidth(int reNumber,int packetNumber) {
         return new BigDecimal(reNumber + packetNumber).divide(new BigDecimal(packetNumber))
                 .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+    }
+
+
+    /**
+     * 模拟多播过程计算传输带宽消耗
+     * @param networkCode
+     * @param number
+     * @param packetNumber
+     * @param interval
+     * @param packetLoss
+     * @param promote
+     * @return 传输带宽消耗
+     */
+    public static double getAveBandwidth(NetworkCode networkCode, int number, int packetNumber, int interval, double packetLoss, double promote) {
+        //重传次数
+        int reNumber = 0;
+        //剩余传输包数
+        int restPacketNumber = packetNumber;
+        int[][] MPEM;
+        while (restPacketNumber >0) {
+            restPacketNumber -= interval;
+            //多播数据包得到MPEM矩阵
+            MPEM = NetworkCodeTools.multicastProcess(restPacketNumber, number, interval, packetLoss);
+            //开始重传
+            while (!MatrixTools.isZeroMatrix(MPEM)) {
+                //得到编码包
+                int[] codePacket = networkCode.getCodePacket(MPEM);
+                reNumber++;
+                MPEM = NetworkCodeTools.decodeProcess(MPEM, codePacket, packetLoss, promote);
+            }
+        }
+        //精确计算保留两位小数
+        double aveBandwidth = NetworkCodeTools.computeAveBandwidth(reNumber, packetNumber);
+        return aveBandwidth;
     }
 }

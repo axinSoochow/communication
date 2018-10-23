@@ -12,35 +12,6 @@ import org.springframework.stereotype.Component;
  */
 @Component("arq")
 public class Arq implements NetworkCode{
-    /**
-     * @param number
-     * @param packatNumber
-     * @param interval
-     * @param packetLoss
-     * @param promote
-     * @return arq的传输带宽消耗
-     */
-    @Override
-    public double getAveBandwidth(int number, int packatNumber, int interval, double packetLoss, double promote) {
-        packetLoss = packetLoss > 0 ? packetLoss : 0;
-        //重传次数
-        int reNumber = 0;
-        //剩余传输包数
-        int restPacketNumber = packatNumber;
-        int[][] MPEM;
-        while (restPacketNumber > 0) {
-            restPacketNumber -= interval;
-            MPEM = NetworkCodeTools.multicastProcess(restPacketNumber, number, interval, packetLoss);
-            while (!MatrixTools.isZeroMatrix(MPEM)) {
-                int[] codePacket = getCodePacket(MPEM);
-                reNumber++;
-                MPEM = NetworkCodeTools.decodeProcess(MPEM, codePacket, packetLoss, promote);
-            }
-        }
-
-        double aveBandwidth = NetworkCodeTools.computeAveBandwidth(reNumber, packatNumber);
-        return aveBandwidth;
-    }
 
     /**
      * 传统ARQ的重传包

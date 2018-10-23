@@ -8,10 +8,6 @@ package com.axin.communication.tools.algorithm;
  * @date 18-10-19
  */
 public class Hwner implements NetworkCode {
-    @Override
-    public double getAveBandwidth(int number, int packetNumber, int interval, double packetLoss, double promote) {
-        return 0;
-    }
 
     @Override
     public int[] getCodePacket(int[][] MPEM) {
