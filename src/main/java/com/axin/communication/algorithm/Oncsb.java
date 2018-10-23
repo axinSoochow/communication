@@ -1,4 +1,4 @@
-package com.axin.communication.tools.algorithm;
+package com.axin.communication.algorithm;
 
 import com.axin.communication.domain.CodeMap;
 import com.axin.communication.tools.common.MatrixTools;

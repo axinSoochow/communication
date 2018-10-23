@@ -1,7 +1,5 @@
-package com.axin.communication.tools.algorithm;
+package com.axin.communication.algorithm;
 
-import com.axin.communication.tools.common.MatrixTools;
-import com.axin.communication.tools.common.NetworkCodeTools;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;

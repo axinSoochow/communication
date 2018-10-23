@@ -1,4 +1,4 @@
-package com.axin.communication.tools.algorithm;
+package com.axin.communication.algorithm;
 
 /**
  * @author Axin
