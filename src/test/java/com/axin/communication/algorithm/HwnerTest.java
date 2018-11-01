@@ -1,4 +1,4 @@
-package com.axin.communication.tools.algorithm;
+package com.axin.communication.algorithm;
 
 import com.axin.communication.CommunicationApplicationTests;
 import com.axin.communication.tools.common.MatrixTools;
@@ -16,7 +16,7 @@ public class HwnerTest extends CommunicationApplicationTests {
 
     @Test
     public void name() {
-        double res = NetworkCodeTools.getBandwidth(hwner, 5, 5, 5, 0.3, 1);
+        double res = NetworkCodeTools.getCommonBandwidth(hwner, 5, 50, 5, 0.3, 1);
         System.out.println(res);
     }
 

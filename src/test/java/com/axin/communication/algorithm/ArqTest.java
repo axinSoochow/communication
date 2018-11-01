@@ -1,4 +1,4 @@
-package com.axin.communication.tools.algorithm;
+package com.axin.communication.algorithm;
 
 import com.axin.communication.CommunicationApplicationTests;
 import com.axin.communication.tools.common.NetworkCodeTools;
@@ -11,7 +11,7 @@ public class ArqTest extends CommunicationApplicationTests {
     NetworkCode arq;
     @Test
     public void getAveBandwidth() {
-        double res = NetworkCodeTools.getBandwidth(arq,5,5,5,0.5,1);
+        double res = NetworkCodeTools.getCommonBandwidth(arq,5,5,5,0.5,1);
         System.out.println(res);
     }
 }

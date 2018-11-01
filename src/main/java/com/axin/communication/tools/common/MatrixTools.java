@@ -1,6 +1,10 @@
 package com.axin.communication.tools.common;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * 矩阵操作工具类
  * @author Axin
@@ -36,5 +40,13 @@ public class MatrixTools {
             }
             System.out.println();
         }
+    }
+
+    public static int[] listToArray(List<Integer> list) {
+        int[] res = new int[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            res[i] = list.get(i);
+        }
+        return res;
     }
 }

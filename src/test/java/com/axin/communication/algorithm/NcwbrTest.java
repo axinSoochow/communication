@@ -1,4 +1,4 @@
-package com.axin.communication.tools.algorithm;
+package com.axin.communication.algorithm;
 
 import com.axin.communication.CommunicationApplicationTests;
 import com.axin.communication.tools.common.NetworkCodeTools;
@@ -13,7 +13,7 @@ public class NcwbrTest extends CommunicationApplicationTests {
 
     @Test
     public void getAveBandwidth() {
-        double res = NetworkCodeTools.getBandwidth(ncwbr,5, 5, 5, 0.5, 1);
+        double res = NetworkCodeTools.getCommonBandwidth(ncwbr,5, 50, 5, 0.5, 1);
         System.out.println(res);
     }
 

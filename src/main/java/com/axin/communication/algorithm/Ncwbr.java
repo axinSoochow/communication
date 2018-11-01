@@ -16,7 +16,6 @@ import java.util.Set;
 @Component("ncwbr")
     public class Ncwbr implements NetworkCode {
 
-
     /**
      * @param MPEM
      * @return 利用NCWBR方法获得编码数据包
@@ -39,4 +38,5 @@ import java.util.Set;
         }
         return res;
     }
+
 }

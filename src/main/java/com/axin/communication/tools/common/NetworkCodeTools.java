@@ -1,8 +1,11 @@
 package com.axin.communication.tools.common;
 
-import com.axin.communication.tools.algorithm.NetworkCode;
+import com.axin.communication.algorithm.NetworkCode;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 网络编码所需要的基本工具类
@@ -97,6 +100,51 @@ public class NetworkCodeTools {
     }
 
     /**
+     * 多态：接收端具有缓存时
+     *
+     * @param MPEM
+     * @param codePacket
+     * @param packetLoss
+     * @param cache
+     * @param promote
+     * @return
+     */
+    public static int[][] decodeProcess(int[][] MPEM, int[] codePacket, double packetLoss, List cache, double promote) {
+        //精确计算保留三位小数
+        //重传后链路丢包率会有减小
+
+        packetLoss = new BigDecimal(packetLoss).multiply(new BigDecimal(1).subtract(new BigDecimal(promote)))
+                .setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
+        if (packetLoss < 0) {
+            packetLoss = 0;
+        }
+
+        for (int i = 0; i < MPEM.length; i++) {
+            //模拟丢包
+            boolean receive = Math.random() > packetLoss ? true : false;
+            if (receive) {
+                int sum = 0;
+                for (int j = 0; j < codePacket.length; j++) {
+                    sum += MPEM[i][codePacket[j]];
+                }
+                //解码成功
+                if (sum <= 1) {
+                    for (int j = 0; j < codePacket.length; j++) {
+                        MPEM[i][codePacket[j]] = 0;
+                    }
+                }
+            }
+        }
+        //将接收的编码包加入缓存
+        for (int n = 0; n < codePacket.length; n++) {
+            cache.add(codePacket[n]);
+        }
+        return MPEM;
+    }
+
+
+
+    /**
      * 精确计算传输带宽消耗
      * @param reNumber
      * @param packetNumber
@@ -110,6 +158,7 @@ public class NetworkCodeTools {
 
     /**
      * 模拟多播过程计算传输带宽消耗
+     * 接收端无缓存功能
      * @param networkCode
      * @param number
      * @param packetNumber
@@ -118,7 +167,7 @@ public class NetworkCodeTools {
      * @param promote
      * @return 传输带宽消耗
      */
-    public static double getBandwidth(NetworkCode networkCode, int number, int packetNumber, int interval, double packetLoss, double promote) {
+    public static double getCommonBandwidth(NetworkCode networkCode, int number, int packetNumber, int interval, double packetLoss, double promote) {
         //重传次数
         int reNumber = 0;
         //剩余传输包数
@@ -135,6 +184,55 @@ public class NetworkCodeTools {
                 reNumber++;
                 MPEM = NetworkCodeTools.decodeProcess(MPEM, codePacket, packetLoss, promote);
             }
+        }
+        //精确计算保留两位小数
+        double aveBandwidth = NetworkCodeTools.computeAveBandwidth(reNumber, packetNumber);
+        return aveBandwidth;
+    }
+
+    /**
+     * 多态：接收端具有缓存功能
+     * @param networkCode
+     * @param number
+     * @param packetNumber
+     * @param interval
+     * @param packetLoss
+     * @param promote
+     * @return
+     */
+    public static double getCacheBandwidth(NetworkCode networkCode, int number, int packetNumber, int interval, double packetLoss, double promote) {
+        //重传次数
+        int reNumber = 0;
+        //剩余传输包数
+        int restPacketNumber = packetNumber;
+        int[][] MPEM;
+        //接收端缓存
+
+        while (restPacketNumber > 0) {
+            restPacketNumber -= interval;
+            //多播数据包得到MPEM矩阵
+            MPEM = NetworkCodeTools.multicastProcess(restPacketNumber, number, interval, packetLoss);
+
+            List<List<Integer>> receiptCache = new ArrayList<>();
+            //开始重传
+            while (!MatrixTools.isZeroMatrix(MPEM)) {
+                //临时缓存
+                List<Integer> cache = new ArrayList<>();
+                //得到编码包
+                int[] codePacket = networkCode.getCodePacket(MPEM);
+                reNumber++;
+                MPEM = NetworkCodeTools.decodeProcess(MPEM, codePacket, packetLoss, cache, promote);
+                receiptCache.add(cache);
+                //判断是否可以利用缓存进行解码
+                if (receiptCache.size() > 1) {
+                    for (int n = 0; n < receiptCache.size()-1; n++) {
+                        int[] temp = MatrixTools.listToArray(receiptCache.get(n));
+                        MPEM = NetworkCodeTools.decodeProcess(MPEM, temp, packetLoss, promote);
+                    }
+                }
+            }
+            //重置缓存
+            receiptCache.clear();
         }
         //精确计算保留两位小数
         double aveBandwidth = NetworkCodeTools.computeAveBandwidth(reNumber, packetNumber);

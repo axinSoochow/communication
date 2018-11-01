@@ -9,9 +9,9 @@ import java.util.*;
 /**
  * 基于ONC的单组合分组广播传输
  * ONCSB
- *
+ * -卢翼2012通信学报
  * @author Axin
- * @date
+ * @date 18-10-20
  */
 @Component("oncsb")
 public class Oncsb implements NetworkCode {

@@ -1,4 +1,4 @@
-package com.axin.communication.tools.algorithm;
+package com.axin.communication.algorithm;
 
 import com.axin.communication.CommunicationApplicationTests;
 import com.axin.communication.tools.common.MatrixTools;
@@ -22,7 +22,7 @@ public class OncsbTest extends CommunicationApplicationTests {
 
     @Test
     public void getBandWidth() {
-        double res = NetworkCodeTools.getBandwidth(oncsb,5,50,50,0.3,1);
+        double res = NetworkCodeTools.getCommonBandwidth(oncsb,5,50,50,0.3,1);
         System.out.println(res);
     }
 }
