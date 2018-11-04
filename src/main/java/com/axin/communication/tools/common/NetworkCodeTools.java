@@ -4,7 +4,6 @@ import com.axin.communication.algorithm.NetworkCode;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -38,6 +37,30 @@ public class NetworkCodeTools {
             }
         }
         return matrix;
+    }
+
+    /**
+     * <p>初始化带时延的MPEM矩阵<br>
+     * <p>重传时延并不考虑数据包在传输过程中所经历的链路时
+     * 延，而是一个数据包接收错误后，经过多少个单位时间间隔后重新接收这个数据包</p>
+     * <p>传输一个数据包需要一个单位时间间隔</p>
+     * @param n
+     * @param m
+     * @param packetLoss
+     * @return
+     */
+    public static int[][] creatDelayMPEM(int n, int m, double packetLoss) {
+        int[][] MPEM = creatMPEM(n, m, packetLoss);
+        int[][] delayMPEM = new int[MPEM.length + 1][MPEM[0].length];
+        for (int i = 0; i < MPEM.length; i++) {
+            for (int j = 0; j < MPEM[0].length; j++) {
+                delayMPEM[i][j] = MPEM[i][j];
+            }
+        }
+        for (int i = 0; i < m; i++) {
+            delayMPEM[MPEM.length][i] = i;
+        }
+        return delayMPEM;
     }
 
     /**
@@ -143,18 +166,31 @@ public class NetworkCodeTools {
     }
 
 
-
     /**
      * 精确计算传输带宽消耗
      * @param reNumber
      * @param packetNumber
      * @return
      */
-    public static double computeAveBandwidth(int reNumber,int packetNumber) {
+    public static double computeBandwidth(int reNumber, int packetNumber) {
         return new BigDecimal(reNumber + packetNumber).divide(new BigDecimal(packetNumber))
                 .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
 
+    /**
+     * 检测两个编码是否满足网络编码解码条件
+     *
+     * @param code1
+     * @param code2
+     * @return
+     */
+    public static boolean detection(int code1, int code2) {
+        if ((code1 ^ code2) == code1 + code2) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * 模拟多播过程计算传输带宽消耗
@@ -186,7 +222,7 @@ public class NetworkCodeTools {
             }
         }
         //精确计算保留两位小数
-        double aveBandwidth = NetworkCodeTools.computeAveBandwidth(reNumber, packetNumber);
+        double aveBandwidth = NetworkCodeTools.computeBandwidth(reNumber, packetNumber);
         return aveBandwidth;
     }
 
@@ -235,7 +271,7 @@ public class NetworkCodeTools {
             receiptCache.clear();
         }
         //精确计算保留两位小数
-        double aveBandwidth = NetworkCodeTools.computeAveBandwidth(reNumber, packetNumber);
+        double aveBandwidth = NetworkCodeTools.computeBandwidth(reNumber, packetNumber);
         return aveBandwidth;
     }
 }

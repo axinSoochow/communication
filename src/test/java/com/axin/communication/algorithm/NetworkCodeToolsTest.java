@@ -1,5 +1,6 @@
 package com.axin.communication.algorithm;
 
+import com.axin.communication.tools.common.MatrixTools;
 import com.axin.communication.tools.common.NetworkCodeTools;
 import org.junit.Test;
 
@@ -28,5 +29,7 @@ public class NetworkCodeToolsTest {
 
     @Test
     public void decodeProcess() {
+        int[][] delayMPEM = NetworkCodeTools.creatDelayMPEM(5, 10, 0.4);
+        MatrixTools.printMatrix(delayMPEM);
     }
 }

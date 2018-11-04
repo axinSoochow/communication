@@ -2,6 +2,7 @@ package com.axin.communication.algorithm;
 
 import com.axin.communication.domain.CodeMap;
 import com.axin.communication.tools.common.MatrixTools;
+import com.axin.communication.tools.common.NetworkCodeTools;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -38,7 +39,7 @@ public class Oncsb implements NetworkCode {
 
         while (nowCode != fullCode && index != map.size()) {
             CodeMap curCode = map.get(index);
-            if (detection(curCode.getCode(), nowCode)) {
+            if (NetworkCodeTools.detection(curCode.getCode(), nowCode)) {
                 codeResult.add(curCode);
                 nowCode += curCode.getCode();
             }
@@ -88,20 +89,7 @@ public class Oncsb implements NetworkCode {
         return codePacket;
     }
 
-    /**
-     * 检测两个编码是否满足网络编码解码条件
-     *
-     * @param code1
-     * @param code2
-     * @return
-     */
-    private boolean detection(int code1, int code2) {
-        if ((code1 ^ code2) == code1 + code2) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+
 
     /**
      * codeMap的code从大到小排序

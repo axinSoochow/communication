@@ -28,5 +28,4 @@ public class Oncmb implements NetworkCode {
     public int[] getCodePacket(int[][] MPEM) {
         return ncwbr.getCodePacket(MPEM);
     }
-
 }

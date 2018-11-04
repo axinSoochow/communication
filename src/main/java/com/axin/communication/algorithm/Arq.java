@@ -17,7 +17,6 @@ public class Arq implements NetworkCode{
      * @param MPEM
      * @return
      */
-
     @Override
     public int[] getCodePacket(int[][] MPEM) {
         for (int i = 0; i < MPEM.length; i++) {
