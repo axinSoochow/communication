@@ -1,6 +1,6 @@
 package com.axin.communication.algorithm;
 
-import com.axin.communication.CommunicationApplicationTests;
+import com.axin.communication.BaseTest;
 import com.axin.communication.tools.common.MatrixTools;
 import com.axin.communication.tools.common.NetworkCodeTools;
 import org.junit.Test;
@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 
-public class OncsbTest extends CommunicationApplicationTests {
+public class OncsbTest extends BaseTest {
     @Autowired
     NetworkCode oncsb;
     @Test

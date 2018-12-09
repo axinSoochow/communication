@@ -1,7 +1,6 @@
 package com.axin.communication.tools.common;
 
 import com.axin.communication.algorithm.NetworkCode;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +57,7 @@ public class NetworkCodeTools {
             }
         }
         for (int i = 0; i < m; i++) {
-            delayMPEM[MPEM.length][i] = i;
+            delayMPEM[MPEM.length][i] = m - 1 - i;
         }
         return delayMPEM;
     }
@@ -83,7 +82,6 @@ public class NetworkCodeTools {
         return MPEM;
     }
 
-
     /**
      * 网络编码解码步骤
      *
@@ -96,30 +94,47 @@ public class NetworkCodeTools {
     public static int[][] decodeProcess(int[][] MPEM, int[] codePacket, double packetLoss, double promote) {
         //精确计算保留三位小数
         //重传后链路丢包率会有减小
+        MPEM = decodeProcess(MPEM, codePacket, packetLoss, promote, false);
+        return MPEM;
+    }
 
-        packetLoss = new BigDecimal(packetLoss).multiply(new BigDecimal(1).subtract(new BigDecimal(promote)))
-                .setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
+    /**
+     *
+     * @param delayMPEM
+     * @param codePacket
+     * @param packetLoss
+     * @param promote
+     * @return
+     */
+    public static int[][] decodeProcess(int[][] delayMPEM, int[] codePacket, double packetLoss,
+        double promote, Boolean isDelayMPEM) {
+
+        int delay = isDelayMPEM ? 1 : 0;
+
+        packetLoss = new BigDecimal(packetLoss)
+            .multiply(new BigDecimal(1).subtract(new BigDecimal(promote)))
+            .setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
         if (packetLoss < 0) {
             packetLoss = 0;
         }
 
-        for (int i = 0; i < MPEM.length; i++) {
+        for (int i = 0; i < delayMPEM.length - delay; i++) {
             //模拟丢包
             boolean receive = Math.random() > packetLoss ? true : false;
             if (receive) {
                 int sum = 0;
                 for (int j = 0; j < codePacket.length; j++) {
-                    sum += MPEM[i][codePacket[j]];
+                    sum += delayMPEM[i][codePacket[j]];
                 }
                 //解码成功
                 if (sum <= 1) {
                     for (int j = 0; j < codePacket.length; j++) {
-                        MPEM[i][codePacket[j]] = 0;
+                        delayMPEM[i][codePacket[j]] = 0;
                     }
                 }
             }
         }
-        return MPEM;
+        return delayMPEM;
     }
 
     /**
@@ -135,7 +150,6 @@ public class NetworkCodeTools {
     public static int[][] decodeProcess(int[][] MPEM, int[] codePacket, double packetLoss, List cache, double promote) {
         //精确计算保留三位小数
         //重传后链路丢包率会有减小
-
         packetLoss = new BigDecimal(packetLoss).multiply(new BigDecimal(1).subtract(new BigDecimal(promote)))
                 .setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
         if (packetLoss < 0) {

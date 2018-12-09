@@ -1,11 +1,11 @@
 package com.axin.communication.algorithm;
 
-import com.axin.communication.CommunicationApplicationTests;
+import com.axin.communication.BaseTest;
 import com.axin.communication.tools.common.NetworkCodeTools;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class ArqTest extends CommunicationApplicationTests {
+public class ArqTest extends BaseTest {
 
     @Autowired
     NetworkCode arq;
