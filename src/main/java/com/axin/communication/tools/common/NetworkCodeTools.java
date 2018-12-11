@@ -192,6 +192,18 @@ public class NetworkCodeTools {
     }
 
     /**
+     * 精确相除
+     * @param a
+     * @param b
+     * @return
+     */
+    public static double computeDivide(double a,double b) {
+        return new BigDecimal(a).divide(new BigDecimal(b))
+                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+    }
+
+
+    /**
      * 检测两个编码是否满足网络编码解码条件
      *
      * @param code1
