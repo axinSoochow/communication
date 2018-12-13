@@ -1,0 +1,8 @@
+# 网络编码仿真参数配置
+networkcode:
+  # 默认基本参数
+  number: 7          # 接受端数量
+  packetNumber: 1000 # 总共传输数据包个数
+  interval: 50       # 传输时间间隔
+  packetLoss: 0.15    # 链路丢包率
+  times: 10           # 实验重复次数
