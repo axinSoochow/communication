@@ -54,6 +54,12 @@
             <scope>test</scope>
         </dependency>
 
+        <!--mongoDB数据库-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+
         <!-- optional=true,依赖不会传递，该项目依赖devtools；之后依赖myboot项目的项目如果想要使用devtools，需要重新引入 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -97,7 +103,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <fork>true</fork>     <!--fork :  如果没有该项配置，devtools不会起作用，即应用不会restart，亲测这个有没有都是可以的-->
+                    <fork>true</fork>     <!--fork :  如果没有该项配置，devtools不会起作用，即应用不会restart-->
                 </configuration>
             </plugin>
         </plugins>

@@ -4,22 +4,23 @@ import com.axin.communication.algorithm.NetworkCode;
 import com.axin.communication.service.ComputeTBService;
 import com.axin.communication.tools.common.NetworkCodeTools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-@Service("arqService")
-public class ArqService implements ComputeTBService {
+@Service("hencService")
+public class Hcdi_hencService implements ComputeTBService {
 
     @Autowired
-    private NetworkCode arq;
+    @Qualifier("hcdi-henc")
+    private NetworkCode hcdihenc;
 
     @Override
     public double computeTB(int number, int packetNumber, int interval, double packetLoss, int times) {
-
         double bandWith = 0;
         for (int i = 0; i < times; i++) {
-            bandWith += NetworkCodeTools.getCommonBandwidth(arq, number, packetNumber, interval, packetLoss, 1);
+            //采用次方法计算则传输时间间隔为总传输包数量大小一致
+            bandWith += NetworkCodeTools.getCommonBandwidth(hcdihenc, number, packetNumber, packetNumber, packetLoss, 1);
         }
-        double res = NetworkCodeTools.computeDivide(bandWith, times);
-        return res;
+        return NetworkCodeTools.computeDivide(bandWith, times);
     }
 }

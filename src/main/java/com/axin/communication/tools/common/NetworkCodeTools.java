@@ -1,6 +1,7 @@
 package com.axin.communication.tools.common;
 
 import com.axin.communication.algorithm.NetworkCode;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,7 @@ public class NetworkCodeTools {
      * <p>重传时延并不考虑数据包在传输过程中所经历的链路时
      * 延，而是一个数据包接收错误后，经过多少个单位时间间隔后重新接收这个数据包</p>
      * <p>传输一个数据包需要一个单位时间间隔</p>
+     *
      * @param n
      * @param m
      * @param packetLoss
@@ -88,7 +90,7 @@ public class NetworkCodeTools {
      * @param MPEM
      * @param codePacket 重传包
      * @param packetLoss 原始丢包率
-     * @param promote      重传丢包率降低百分比%
+     * @param promote    重传丢包率降低百分比%
      * @return 解码后的MPEM矩阵
      */
     public static int[][] decodeProcess(int[][] MPEM, int[] codePacket, double packetLoss, double promote) {
@@ -99,7 +101,6 @@ public class NetworkCodeTools {
     }
 
     /**
-     *
      * @param delayMPEM
      * @param codePacket
      * @param packetLoss
@@ -107,13 +108,13 @@ public class NetworkCodeTools {
      * @return
      */
     public static int[][] decodeProcess(int[][] delayMPEM, int[] codePacket, double packetLoss,
-        double promote, Boolean isDelayMPEM) {
+                                        double promote, Boolean isDelayMPEM) {
 
         int delay = isDelayMPEM ? 1 : 0;
 
         packetLoss = new BigDecimal(packetLoss)
-            .multiply(new BigDecimal(1).subtract(new BigDecimal(promote)))
-            .setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
+                .multiply(new BigDecimal(1).subtract(new BigDecimal(promote)))
+                .setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
         if (packetLoss < 0) {
             packetLoss = 0;
         }
@@ -182,6 +183,7 @@ public class NetworkCodeTools {
 
     /**
      * 精确计算传输带宽消耗
+     *
      * @param reNumber
      * @param packetNumber
      * @return
@@ -193,15 +195,28 @@ public class NetworkCodeTools {
 
     /**
      * 精确相除
+     *
      * @param a
      * @param b
      * @return
      */
-    public static double computeDivide(double a,double b) {
-        return new BigDecimal(a).divide(new BigDecimal(b))
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+    public static double computeDivide(double a, double b) {
+        double res2 = new BigDecimal(a).divide(new BigDecimal(b),2,BigDecimal.ROUND_HALF_UP).doubleValue();
+        return res2;
     }
 
+    /**
+     * 计算编码增益Gain
+     * 10*log(arq方法/networkcode方法)
+     *
+     * @param arq
+     * @param networkcode
+     * @return
+     */
+    public static double computeGain(double arq, double networkcode) {
+        double ratio = NetworkCodeTools.computeDivide((arq - networkcode), arq);
+        return ratio;
+    }
 
     /**
      * 检测两个编码是否满足网络编码解码条件
@@ -221,6 +236,7 @@ public class NetworkCodeTools {
     /**
      * 模拟多播过程计算传输带宽消耗
      * 接收端无缓存功能
+     *
      * @param networkCode
      * @param number
      * @param packetNumber
@@ -235,7 +251,7 @@ public class NetworkCodeTools {
         //剩余传输包数
         int restPacketNumber = packetNumber;
         int[][] MPEM;
-        while (restPacketNumber >0) {
+        while (restPacketNumber > 0) {
             restPacketNumber -= interval;
             //多播数据包得到MPEM矩阵
             MPEM = NetworkCodeTools.multicastProcess(restPacketNumber, number, interval, packetLoss);
@@ -254,6 +270,7 @@ public class NetworkCodeTools {
 
     /**
      * 多态：接收端具有缓存功能
+     *
      * @param networkCode
      * @param number
      * @param packetNumber
@@ -287,7 +304,7 @@ public class NetworkCodeTools {
                 receiptCache.add(cache);
                 //判断是否可以利用缓存进行解码
                 if (receiptCache.size() > 1) {
-                    for (int n = 0; n < receiptCache.size()-1; n++) {
+                    for (int n = 0; n < receiptCache.size() - 1; n++) {
                         int[] temp = MatrixTools.listToArray(receiptCache.get(n));
                         MPEM = NetworkCodeTools.decodeProcess(MPEM, temp, packetLoss, promote);
                     }

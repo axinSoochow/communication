@@ -1,6 +1,5 @@
 package com.axin.communication.service.algorithmService;
 
-
 import com.axin.communication.algorithm.NetworkCode;
 import com.axin.communication.service.ComputeTBService;
 import com.axin.communication.tools.common.NetworkCodeTools;

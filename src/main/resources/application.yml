@@ -1,8 +1,39 @@
+spring:
+  # 热部署配置
+  devtools:
+    restart:
+      enabled: true
+  data:
+    #mongodb的选项配置#mongodb的选项配置，申请Mongo请参考：http://doc.io/infrastructure/mongo/overview.html
+    mongodb:
+      uri: mongodb://axin:2333@localhost:27017/communication
+      options:
+        clientName: ${spring.application.name} # 客户端的标识，用于定位请求来源等
+        connectionTimeoutMs: 10000     # TCP连接超时，毫秒
+        readTimeoutMs: 15000       # TCP读取超时，毫秒
+        poolMaxWaitTimeMs: 3000        #当连接池无可用连接时客户端阻塞等待的时长，单位毫秒
+        connectionMaxIdleTimeMs: 60000   #TCP连接闲置时间，单位毫秒
+        connectionMaxLifeTimeMs: 120000    #TCP连接最多可以使用多久，单位毫秒
+        heartbeatFrequencyMs: 20000      #心跳检测发送频率，单位毫秒
+        minHeartbeatFrequencyMs: 8000    #最小的心跳检测发送频率，单位毫秒
+        heartbeatConnectionTimeoutMs: 10000  #心跳检测TCP连接超时，单位毫秒
+        heartbeatReadTimeoutMs: 15000    #心跳检测TCP连接读取超时，单位毫秒
+        connectionsPerHost: 20       # 每个host的TCP连接数
+        minConnectionsPerHost: 5     #每个host的最小TCP连接数
+        #计算允许多少个线程阻塞等待可用TCP连接时的乘数，算法：threadsAllowedToBlockForConnectionMultiplier*connectionsPerHost，当前配置允许10*20个线程阻塞
+        threadsAllowedToBlockForConnectionMultiplier: 10
+
+
 # 网络编码仿真参数配置
 networkcode:
   # 默认基本参数
-  number: 7          # 接受端数量
-  packetNumber: 1000 # 总共传输数据包个数
-  interval: 50       # 传输时间间隔
-  packetLoss: 0.15    # 链路丢包率
-  times: 10           # 实验重复次数
+  number: 7             # 接受端数量
+  packetNumber: 1000    # 总共传输数据包个数
+  interval: 50          # 传输时间间隔
+  packetLoss: 0.15      # 链路丢包率
+  times: 10             # 实验重复次数
+  hcdi:
+    originalPacket: 10  # 初始发包数
+    timeToLive: 1000    # TTL
+    cacheThreshold: 50  # 缓存阈值大小
+    nextPacket: 10      # 下一组发包数

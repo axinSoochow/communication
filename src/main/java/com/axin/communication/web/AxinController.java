@@ -29,12 +29,18 @@ public class AxinController {
     @Autowired
     private ComputePerformanceService computePerformanceService;
 
-    @RequestMapping("/hello")
-    public String hello() {
-        log.info("number:{}",number);
+    @RequestMapping("/number")
+    public String computeNumber() {
 
         computePerformanceService.computePerformanceWithNumberChange(number,packetNumber,interval,packetLoss,times);
-        return "hello world!";
+        return "计算完毕!";
+    }
+
+    @RequestMapping("/packetloss")
+    public String computePacketLoss() {
+
+        computePerformanceService.computePerformanceWithPacketLossChange(number, packetNumber, interval, packetLoss, times);
+        return "计算完毕!";
     }
 
 }
