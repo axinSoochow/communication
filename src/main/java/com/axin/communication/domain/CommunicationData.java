@@ -18,6 +18,11 @@ public class CommunicationData {
     protected NetworkCodeTypeEnum networkCodeType;
 
     /**
+     * 基本参数条件
+     */
+    protected Map<String, String> param;
+
+    /**
      * x轴参数
      */
     protected List<Double> axis;

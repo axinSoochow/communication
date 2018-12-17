@@ -201,8 +201,24 @@ public class NetworkCodeTools {
      * @return
      */
     public static double computeDivide(double a, double b) {
-        double res2 = new BigDecimal(a).divide(new BigDecimal(b),2,BigDecimal.ROUND_HALF_UP).doubleValue();
+        double res2 = new BigDecimal(a).divide(new BigDecimal(b), 2, BigDecimal.ROUND_HALF_UP).doubleValue();
         return res2;
+    }
+
+    /**
+     * 得到丢失包个数
+     *
+     * @param delayMEPM
+     * @return
+     */
+    public static int getRestPacket(int[][] delayMEPM) {
+        int res;
+        try {
+            res = delayMEPM[0].length;
+        } catch (Exception e) {
+            return 0;
+        }
+        return res;
     }
 
     /**
@@ -231,6 +247,19 @@ public class NetworkCodeTools {
         } else {
             return false;
         }
+    }
+
+
+    /**
+     * 理论最优传输带宽消耗
+     *
+     * @param packetLoss
+     * @return
+     */
+    public static double computeTheoryBandWith(double packetLoss) {
+        //1-P
+        BigDecimal b = new BigDecimal(1).subtract(new BigDecimal(packetLoss));
+        return new BigDecimal(1).divide(b, 2, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
 
     /**

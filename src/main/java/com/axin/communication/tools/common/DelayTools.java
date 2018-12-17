@@ -31,6 +31,14 @@ public class DelayTools {
    * @param delayMPEM
    */
   public static void addDelay(int[][] delayMPEM) {
+
+    //检验是否delayMPEM无数据
+    try {
+      int test = delayMPEM[0].length;
+    } catch (Exception e) {
+      return;
+    }
+
     int number = delayMPEM.length - 1;
     int packet = delayMPEM[0].length;
 

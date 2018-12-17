@@ -1,8 +1,10 @@
 package com.axin.communication.service;
 
 import com.alibaba.fastjson.JSON;
+import com.axin.communication.algorithm.HcdiNcBsc;
 import com.axin.communication.dao.CommunicationDao;
 import com.axin.communication.domain.CommunicationData;
+import com.axin.communication.domain.TaskResult;
 import com.axin.communication.domain.enums.NetworkCodeTypeEnum;
 import com.axin.communication.tools.common.NetworkCodeTools;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +52,9 @@ public class ComputePerformanceService {
     @Autowired
     @Qualifier("ncbscService")
     private ComputeTBService ncbscService;
+
+    @Autowired
+    private HcdiNcBsc hcdiNcBsc;
 
     @Autowired
     private CommunicationDao communicationDao;
@@ -118,7 +123,7 @@ public class ComputePerformanceService {
             hencData.add(henc);
             hencGData.add(NetworkCodeTools.computeGain(arq, henc));
             //7.hcdi-ncbscService
-            ncbsc = ncbscService.computeTB(i, packetNumber, interval, packetLoss, times);
+            ncbsc = ncbscService.computeTB(i, packetNumber, 0, packetLoss, times);
             ncbscData.add(ncbsc);
             ncbscGData.add(NetworkCodeTools.computeGain(arq, ncbsc));
         }
@@ -151,13 +156,23 @@ public class ComputePerformanceService {
         data.setValue(map);
         data.setCreatDate(new Date());
         data.setNetworkCodeType(NetworkCodeTypeEnum.NUMBER);
+
+        Map<String, String> param = new HashMap<>();
+        param.put("接收端数量", "2-12:1");
+        param.put("总传输包数", packetNumber + "");
+        param.put("传输时间间隔", interval + "");
+        param.put("链路丢包率", packetLoss + "");
+        param.put("实验重复次数", times + "");
+        param.put("ncbsb参数", "采用约定参数");
+
+        data.setParam(param);
         communicationDao.addData(data);
+        log.info("保存成功！");
 
 
         //Log
         log.info("基本参数：（接收端数量：{}），（总传输数据包数：{}，（传输时间间隔：{}），（链路丢包率：{}），（实验重复次数：{}）",
                 number, packetNumber, interval, packetLoss, times);
-        log.info("X轴数值为：\n{}", JSON.toJSONString(axis));
 
         log.info("\n" +
                         "X轴数值为{}\n" +
@@ -230,7 +245,7 @@ public class ComputePerformanceService {
 
 
         log.info("开始计算：链路丢包率变化0.05-0.30:0.05与传输带宽关系");
-        for (int i = 5; i <= 30; i+=5) {
+        for (int i = 5; i <= 30; i += 5) {
 
             //处理double类型的链路丢包率
             packetLoss = new BigDecimal(new Double(i)).divide(new BigDecimal(100)).doubleValue();
@@ -260,7 +275,7 @@ public class ComputePerformanceService {
             hencData.add(henc);
             hencGData.add(NetworkCodeTools.computeGain(arq, henc));
             //7.hcdi-ncbscService
-            ncbsc = ncbscService.computeTB(number, packetNumber, interval, packetLoss, times);
+            ncbsc = ncbscService.computeTB(number, packetNumber, 0, packetLoss, times);
             ncbscData.add(ncbsc);
             ncbscGData.add(NetworkCodeTools.computeGain(arq, ncbsc));
         }
@@ -293,9 +308,21 @@ public class ComputePerformanceService {
         data.setValue(map);
         data.setCreatDate(new Date());
         data.setNetworkCodeType(NetworkCodeTypeEnum.PACKETLOSS);
+
+        Map<String, String> param = new HashMap<>();
+        param.put("接收端数量", number + "");
+        param.put("总传输包数", packetNumber + "");
+        param.put("传输时间间隔", interval + "");
+        param.put("链路丢包率", "0.05-0.30:0.05");
+        param.put("实验重复次数", times + "");
+        param.put("ncbsb参数", "采用约定参数");
+
+        data.setParam(param);
         communicationDao.addData(data);
+        log.info("保存成功！");
 
 
+        //Log
         log.info("基本参数：（接收端数量：{}），（总传输数据包数：{}，（传输时间间隔：{}），（链路丢包率：{}），（实验重复次数：{}）",
                 number, packetNumber, interval, packetLoss, times);
         log.info("X轴数值为：\n{}", JSON.toJSONString(axis));
@@ -338,14 +365,182 @@ public class ComputePerformanceService {
     /**
      * 3 缓存大小10-100:5变化，得出缓存大小变化与传输带宽关系图
      */
-    public void computePerformanceWithCacheChange() {
+    public void computePerformanceWithCacheChange(int number, int packetNumber, int interval, double packetLoss, int times) {
+        //0.x轴
+        List<Double> axis = new ArrayList<>();
 
+        List<Double> arqData = new ArrayList<>();
+        List<Double> ncbscData = new ArrayList<>();
+        List<Double> theoryData = new ArrayList<>();
+
+        List<Double> ncbscGData = new ArrayList<>();
+
+        double arq;
+        double ncbsc;
+        double theory = NetworkCodeTools.computeTheoryBandWith(packetLoss);
+
+        log.info("开始计算：缓存大小10-100:5变化，得出缓存大小变化与传输带宽关系");
+        for (int i = 10; i <= 100; i += 5) {
+            axis.add(new Double(i));
+
+            //1.arq
+            arq = arqService.computeTB(number, packetNumber, interval, packetLoss, times);
+            arqData.add(arq);
+
+            ncbsc = ncbscService.computeTB(number, packetNumber, i, packetLoss, times);
+            ncbscData.add(ncbsc);
+            ncbscGData.add(NetworkCodeTools.computeGain(arq, ncbsc));
+
+            //理论
+//            theoryData.add(theory);
+        }
+
+        //Dao
+        log.info("开始保存计算数据！");
+        Map<String, List<Double>> map = new HashMap<>();
+        map.put("arq", arqData);
+
+        map.put("ncbsc", ncbscData);
+        map.put("ncbscG", ncbscGData);
+//        map.put("theory", theoryData);
+
+
+        CommunicationData data = new CommunicationData();
+        data.setAxis(axis);
+        data.setValue(map);
+        data.setCreatDate(new Date());
+        data.setNetworkCodeType(NetworkCodeTypeEnum.CACHE);
+
+        Map<String, String> param = new HashMap<>();
+        param.put("接收端数量", number + "");
+        param.put("总传输包数", packetNumber + "");
+        param.put("传输时间间隔", interval + "");
+        param.put("链路丢包率", packetLoss + "");
+        param.put("实验重复次数", times + "");
+        param.put("ncbsb参数", "缓存大小10-100:5变化");
+
+        data.setParam(param);
+        communicationDao.addData(data);
+        log.info("保存成功！");
+
+        //Log
+        log.info("\n" +
+                        "X轴的数值为{}\n" +
+                        "arq数据为{}\n" +
+                        "ncbsc数据为{}"
+                , JSON.toJSONString(axis)
+                , JSON.toJSONString(arqData)
+                , JSON.toJSONString(ncbscData)
+        );
+
+        log.info("\n" +
+                        "X轴数值为{}\n" +
+                        "ncbsc增益数据为{}"
+                , JSON.toJSONString(axis)
+                , JSON.toJSONString(ncbscGData)
+        );
     }
 
     /**
-     * 4 TTL 50-500:10变换，得出TT L大小变化与传输带宽关系图
+     * 4 TTL 10-200:10变化，得出TTL大小变化与传输带宽关系图
      */
-    public void computePerformanceWithTTLChange() {
+
+    public void computePerformanceWithTTLChange(int number, int packetNumber, int interval, double packetLoss, int times) {
+        //0.x轴
+        List<Double> axis = new ArrayList<>();
+
+        List<Double> arqData = new ArrayList<>();
+        List<Double> ncbscData = new ArrayList<>();
+
+
+        List<Double> ncbscGData = new ArrayList<>();
+        List<Double> ttlTimesData = new ArrayList<>();
+        List<Double> cacheOverTimesData = new ArrayList<>();
+
+
+        double arq;
+        double ncbsc;
+        double ttlTimes;
+        double cacheOverTimes;
+
+
+        log.info("开始计算：TTL 10-200:10变化，得出TTL大小变化与传输带宽关系");
+        //细粒度控制ncbsc变量
+        for (int i = 10; i <= 50; i += 5) {
+            ncbsc = 0;
+            ttlTimes = 0;
+            cacheOverTimes = 0;
+
+            axis.add(new Double(i));
+
+            //1.arq
+            arq = arqService.computeTB(number, packetNumber, interval, packetLoss, times);
+            arqData.add(arq);
+
+            //重复实验
+            for (int j = 0; j < times; j++) {
+                TaskResult result = hcdiNcBsc.getBandWithAndDelay(number, packetNumber, packetLoss, 10, i, 50, 10, 1);
+                ncbsc += NetworkCodeTools.computeBandwidth(result.getReNumber(), packetNumber);
+                ttlTimes += result.getTtlTimes();
+                cacheOverTimes += result.getCacheOverflow();
+            }
+            ncbsc = NetworkCodeTools.computeDivide(ncbsc, times);
+            ttlTimes = NetworkCodeTools.computeDivide(new Double(ttlTimes), times);
+            cacheOverTimes = (int) NetworkCodeTools.computeDivide(new Double(cacheOverTimes), times);
+
+            ttlTimesData.add(ttlTimes);
+            cacheOverTimesData.add(cacheOverTimes);
+            ncbscData.add(ncbsc);
+            ncbscGData.add(NetworkCodeTools.computeGain(arq, ncbsc));
+        }
+
+        //Dao
+        log.info("开始保存计算数据！");
+        Map<String, List<Double>> map = new HashMap<>();
+        map.put("arq", arqData);
+
+        map.put("ncbsc", ncbscData);
+        map.put("ncbscG", ncbscGData);
+        map.put("ttlTimes", ttlTimesData);
+
+        CommunicationData data = new CommunicationData();
+        data.setAxis(axis);
+        data.setValue(map);
+        data.setCreatDate(new Date());
+        data.setNetworkCodeType(NetworkCodeTypeEnum.TTL);
+
+        Map<String, String> param = new HashMap<>();
+        param.put("接收端数量", number + "");
+        param.put("总传输包数", packetNumber + "");
+        param.put("传输时间间隔", interval + "");
+        param.put("链路丢包率", packetLoss + "");
+        param.put("实验重复次数", times + "");
+        param.put("ncbsb参数", "TTL 10-200:10变化");
+
+        data.setParam(param);
+        communicationDao.addData(data);
+        log.info("保存成功！");
+
+        //Log
+        log.info("\n" +
+                        "X轴的数值为{}\n" +
+                        "arq数据为{}\n" +
+                        "ncbsc数据为{}"
+                , JSON.toJSONString(axis)
+                , JSON.toJSONString(arqData)
+                , JSON.toJSONString(ncbscData)
+        );
+
+        log.info("\n" +
+                        "X轴数值为{}\n" +
+                        "ncbsc增益数据为{}\n" +
+                        "超时触发次数为{}\n" +
+                        "清理缓存触发次数{}"
+                , JSON.toJSONString(axis)
+                , JSON.toJSONString(ncbscGData)
+                , JSON.toJSONString(ttlTimesData)
+                , JSON.toJSONString(cacheOverTimesData)
+        );
 
     }
 

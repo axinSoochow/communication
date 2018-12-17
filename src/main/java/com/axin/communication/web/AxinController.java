@@ -32,7 +32,7 @@ public class AxinController {
     @RequestMapping("/number")
     public String computeNumber() {
 
-        computePerformanceService.computePerformanceWithNumberChange(number,packetNumber,interval,packetLoss,times);
+        computePerformanceService.computePerformanceWithNumberChange(number, packetNumber, interval, packetLoss, times);
         return "计算完毕!";
     }
 
@@ -43,4 +43,25 @@ public class AxinController {
         return "计算完毕!";
     }
 
+    @RequestMapping("/cache")
+    public String computeCache() {
+//        packetLoss = 0.20;
+        computePerformanceService.computePerformanceWithCacheChange(number, packetNumber, interval, packetLoss, times);
+        return "计算完毕！";
+    }
+
+
+    @RequestMapping("/ttl")
+    public String computeTTL() {
+        computePerformanceService.computePerformanceWithTTLChange(number, packetNumber, interval, packetLoss, 1);
+        return "计算完毕！";
+    }
+
 }
+
+
+
+
+
+
+

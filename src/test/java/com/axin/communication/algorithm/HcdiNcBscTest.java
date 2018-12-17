@@ -4,11 +4,12 @@ import com.axin.communication.BaseTest;
 import com.axin.communication.domain.TaskResult;
 import com.axin.communication.tools.common.MatrixTools;
 import com.axin.communication.tools.common.NetworkCodeTools;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
 
 @Slf4j
 public class HcdiNcBscTest extends BaseTest {
@@ -18,6 +19,21 @@ public class HcdiNcBscTest extends BaseTest {
         MatrixTools.printMatrix(delayMPEM);
 //        int[][] deleteZero= HcdiNcBsc.deleteZero(delayMPEM);
 //        MatrixTools.printMatrix(deleteZero);
+    }
+
+    @Test
+    public void testMatrix() {
+        int[][] matrix = new int[][]{};
+        int num;
+        try {
+            num = matrix[0].length;
+        }catch (Exception e){
+            num = 0;
+        }
+
+
+        System.out.println("判断成功！");
+        System.out.println(num);
     }
 
     @Test

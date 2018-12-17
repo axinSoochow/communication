@@ -57,7 +57,8 @@ public class HcdiNcBsc {
         int delay = 0;
         //缓存溢出次数
         int cacheOverflow = 0;
-
+        //ttl超时次数
+        int ttlTimes = 0;
 
         //发一组初始包
         packetNumber -= originalPacket;
@@ -70,7 +71,6 @@ public class HcdiNcBsc {
             delayMPEMCache = MatrixTools.jointMatrix(delayMPEMCache, delayMPEM);
             delayMPEMCache = deleteZero(delayMPEMCache);
 
-
             //2. 缓存中的矩阵不是null矩阵
             if (!MatrixTools.isZeroMatrix(delayMPEMCache)) {
                 //2.1计算缓存中每列hash值
@@ -79,6 +79,8 @@ public class HcdiNcBsc {
                 //2.2有TTL大于timeToLive的包->编码进行重传
                 int[] codePacket;
                 if (delayMPEMCache[delayIndex][0] >= timeToLive) {
+
+                    ttlTimes++;
                     codePacket = findTTLPacket(delayMPEMCache, hashcode);
 //                    log.info("获得TTL编码包");
 //                    System.out.println(Arrays.toString(codePacket));
@@ -92,17 +94,21 @@ public class HcdiNcBsc {
                 if (codePacket != null) {
                     delayMPEMCache = NetworkCodeTools
                             .decodeProcess(delayMPEMCache, codePacket, packetLoss, promote, true);
+                    //有解码包->重传次数++
+                    reNumber++;
                 }
 
                 //2.4解码后-计算时延-将所有零列的时延累加
                 //dealyMPEMCache矩阵剪枝
-                reNumber++;
                 delay += DelayTools.computeDelay(delayMPEMCache);
                 delayMPEMCache = deleteZero(delayMPEMCache);
 
                 //计算缓存
-                cache = delayMPEMCache[0].length;
-//                log.info("缓存中目前存在的{}个待重传数据包", cache);
+                try {
+                    cache = delayMPEMCache[0].length;
+                } catch (Exception e) {
+                    cache = 0;
+                }
                 //2.5簇头缓存超过阈值->SCP编码重传并计算时延计算直到小于阈值
                 while (cache > cacheThreshold) {
 //                    log.info("——故缓存超过阈值，发送SCP包！");
@@ -113,14 +119,13 @@ public class HcdiNcBsc {
                             .decodeProcess(delayMPEMCache, codePacket, packetLoss, promote, true);
                     //统计延时
                     delay += DelayTools.computeDelay(delayMPEMCache);
-                    //矩阵剪枝
+                    //矩阵剪枝并重新计算缓存大小
                     delayMPEMCache = deleteZero(delayMPEMCache);
                     cache = delayMPEMCache[0].length;
 
                     //经过一个时隙，增加时间
                     DelayTools.addDelay(delayMPEMCache);
 
-//                    log.info("——当前缓存数{}", cache);
                     //缓存溢出次数+1;重传次数+1
                     cacheOverflow++;
                     reNumber++;
@@ -131,20 +136,17 @@ public class HcdiNcBsc {
 
             //3. 检查待发送数据包数
             if (packetNumber <= 0) {
-//                log.info("待发送包为0，将缓存中所有数据包编码发送，传输完成！");
                 //清空缓存-计算时延
                 int codePacket[];
-                while (delayMPEMCache[0].length == 0) {
+                while (NetworkCodeTools.getRestPacket(delayMPEMCache) != 0) {
                     delayMPEMCache = deleteZero(delayMPEMCache);
                     hashcode = computeHashcode(delayMPEMCache);
                     codePacket = findTTLPacket(delayMPEMCache, hashcode);
                     //统计时延
-
                     delayMPEMCache = NetworkCodeTools
                             .decodeProcess(delayMPEMCache, codePacket, packetLoss, promote, true);
 
                     delay += DelayTools.computeDelay(delayMPEMCache);
-
                     delayMPEMCache = deleteZero(delayMPEMCache);
                     //重传次数+1
                     reNumber++;
@@ -152,20 +154,20 @@ public class HcdiNcBsc {
                 //跳出循环
                 break;
             }
+
             //发下一组包
-//            log.info("准备发下一组包，现在包剩余数{}", packetNumber);
             packetNumber -= nextPacket;
             if (packetNumber > 0) {
                 delayMPEM = NetworkCodeTools.creatDelayMPEM(numebr, nextPacket, packetLoss);
-//                log.info("发送了{}个数据包", nextPacket);
             } else {
                 delayMPEM = NetworkCodeTools.creatDelayMPEM(numebr, packetNumber + nextPacket, packetLoss);
-//                log.info("发送了{}个数据包", nextPacket + packetNumber);
             }
 
         }
-//        log.info("返回结果:重传次数为{},总传输时延为{},缓存溢出了{}次", reNumber, delay, cacheOverflow);
-        return new TaskResult(reNumber, delay, cacheOverflow);
+//        log.info("TTL共超时{}次", ttlTimes);
+//        log.info("缓存溢出共{}次", cacheOverflow);
+//        log.info("重传次数共{}次", reNumber);
+        return new TaskResult(reNumber, delay, ttlTimes, cacheOverflow);
     }
 
     /**
@@ -174,7 +176,6 @@ public class HcdiNcBsc {
     private boolean verifyParams(int numebr, int packetNumber, double packetLoss,
                                  int originalPacket, int timeToLive, int cacheThreshold, int nextPacket,
                                  double promote) {
-
         if (numebr <= 0) {
             log.error("终端数量不能小于0！");
             return false;
@@ -198,7 +199,6 @@ public class HcdiNcBsc {
 
         return true;
     }
-
 
     /**
      * 按照时延顺序进行贪婪得到OCP or SCP

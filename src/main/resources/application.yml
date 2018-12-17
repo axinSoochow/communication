@@ -30,7 +30,7 @@ networkcode:
   number: 7             # 接受端数量
   packetNumber: 1000    # 总共传输数据包个数
   interval: 50          # 传输时间间隔
-  packetLoss: 0.15      # 链路丢包率
+  packetLoss: 0.20      # 链路丢包率
   times: 10             # 实验重复次数
   hcdi:
     originalPacket: 10  # 初始发包数

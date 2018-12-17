@@ -20,6 +20,11 @@ public class TaskResult {
     private int delay;
 
     /**
+     * ttl超时次数
+     */
+    private int ttlTimes;
+
+    /**
      * 缓存溢出次数
      */
     private int cacheOverflow;
