@@ -14,9 +14,9 @@ public interface ComputeDelayService {
      * @param packetNumber
      * @param interval
      * @param packetLoss
+     * @param times
      * @return
      */
-    double computeDelay(int number, int packetNumber, int interval, double packetLoss);
-
+    double computeDelay(int number, int packetNumber, int interval, double packetLoss, int times);
 
 }

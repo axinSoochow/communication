@@ -85,6 +85,26 @@ public class NetworkCodeTools {
     }
 
     /**
+     * 多播过程——发送端得到delayMPEM矩阵
+     *
+     * @param restPacketNumber
+     * @param number
+     * @param interval
+     * @param packetLoss
+     * @return
+     */
+    public static int[][] multicastProcessDelay(int restPacketNumber, int number, int interval, double packetLoss) {
+        int[][] delayMPEM;
+        if (restPacketNumber >= 0) {
+            delayMPEM = NetworkCodeTools.creatDelayMPEM(number, interval, packetLoss);
+        } else {
+            //如果剩余数据包小于重传时间间隔
+            delayMPEM = NetworkCodeTools.creatDelayMPEM(number, restPacketNumber + interval, packetLoss);
+        }
+        return delayMPEM;
+    }
+
+    /**
      * 网络编码解码步骤
      *
      * @param MPEM
@@ -297,8 +317,9 @@ public class NetworkCodeTools {
         return aveBandwidth;
     }
 
+
     /**
-     * 多态：接收端具有缓存功能
+     * 接收端具有缓存功能
      *
      * @param networkCode
      * @param number

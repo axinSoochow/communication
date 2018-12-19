@@ -57,6 +57,12 @@ public class AxinController {
         return "计算完毕！";
     }
 
+    @RequestMapping("/delay")
+    public String computeDelay() {
+        computePerformanceService.computePerformanceWithDelay(number, packetNumber, interval, packetLoss, 1);
+        return "计算完毕！";
+    }
+
 }
 
 

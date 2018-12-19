@@ -19,7 +19,6 @@ import java.util.*;
  * @author axin
  * @Date 18-12-11
  * @summy 算法性能计算服务
- * @
  */
 @Slf4j
 @Service
@@ -50,6 +49,9 @@ public class ComputePerformanceService {
     private ComputeTBService hencService;
 
     @Autowired
+    private ComputeDelayService hencDelayService;
+
+    @Autowired
     @Qualifier("ncbscService")
     private ComputeTBService ncbscService;
 
@@ -64,7 +66,8 @@ public class ComputePerformanceService {
      * 1.1 计算接收端数量从2-12:1变化，得出数量变化与传输带宽关系图
      * 1.2 对应的编码增益图
      */
-    public void computePerformanceWithNumberChange(int number, int packetNumber, int interval, double packetLoss, int times) {
+    public void computePerformanceWithNumberChange(int number, int packetNumber, int interval, double packetLoss, int times)
+    {
         //0.x轴
         List<Double> axis = new ArrayList<>();
 
@@ -442,9 +445,11 @@ public class ComputePerformanceService {
     }
 
     /**
-     * 4 TTL 10-200:10变化，得出TTL大小变化与传输带宽关系图
+     * 4.1 TTL 10-200:10变化，得出TTL大小变化与传输带宽关系图
+     * 4.2 对应增益图
+     * 4.3 对应的ttl超时触发次数
+     * 4.4 对应缓存阈值触发次数
      */
-
     public void computePerformanceWithTTLChange(int number, int packetNumber, int interval, double packetLoss, int times) {
         //0.x轴
         List<Double> axis = new ArrayList<>();
@@ -535,21 +540,81 @@ public class ComputePerformanceService {
                         "X轴数值为{}\n" +
                         "ncbsc增益数据为{}\n" +
                         "超时触发次数为{}\n" +
-                        "清理缓存触发次数{}"
+                        "缓存阈值触发次数{}"
                 , JSON.toJSONString(axis)
                 , JSON.toJSONString(ncbscGData)
                 , JSON.toJSONString(ttlTimesData)
                 , JSON.toJSONString(cacheOverTimesData)
         );
-
     }
 
     /**
-     * 5.1 丢包率0.1-0.5:0.1变化，得出丢包率变化与重传时延关系图
-     * 5.2 接收端数量从2-12:1变化，得出接收端数量变化与重传时延
+     * 5.1 TTL10-100:10变化，得出TTL变化与重传时延关系
+     * 5.2 henc与ncbsc时延对比
      */
-    public void computePerformanceWithDelay() {
+    public void computePerformanceWithDelay(int number, int packetNumber, int interval, double packetLoss, int times) {
+        //0.x轴
+        List<Double> axis = new ArrayList<>();
 
+        List<Double> ncbscData = new ArrayList<>();
+        List<Double> hencData = new ArrayList<>();
+
+        double ncbsc;
+        double henc;
+
+        //ncbsc
+        for (int i = 10; i <= 100; i += 10) {
+            ncbsc = 0;
+            axis.add(new Double(i));
+            for (int j = 0; j < times; j++) {
+                TaskResult result = hcdiNcBsc.getBandWithAndDelay(number, packetNumber, packetLoss, 10, i, 50, 10, 1);
+                ncbsc += result.getDelay();
+            }
+            henc = hencDelayService.computeDelay(number, packetNumber, interval, packetLoss, times);
+            ncbsc = NetworkCodeTools.computeDivide(ncbsc, times);
+            ncbscData.add(ncbsc);
+            hencData.add(henc);
+        }
+
+        //Dao
+        log.info("开始保存计算数据！");
+        Map<String, List<Double>> map = new HashMap<>();
+
+        map.put("ncbsc", ncbscData);
+        map.put("henc", hencData);
+
+        CommunicationData data = new CommunicationData();
+        data.setAxis(axis);
+        data.setValue(map);
+        data.setCreatDate(new Date());
+        data.setNetworkCodeType(NetworkCodeTypeEnum.TTL);
+
+        Map<String, String> param = new HashMap<>();
+        param.put("接收端数量", number + "");
+        param.put("总传输包数", packetNumber + "");
+        param.put("传输时间间隔", interval + "");
+        param.put("链路丢包率", packetLoss + "");
+        param.put("实验重复次数", times + "");
+        param.put("ncbsb参数", "TTL 10-200:10变化");
+
+        data.setParam(param);
+        communicationDao.addData(data);
+        log.info("保存成功！");
+
+        //Log
+        log.info("\n" +
+                        "X轴数值为{}\n" +
+                        "ncbsc时延数据为{}\n" +
+                        "henc时延数据为{}"
+                , JSON.toJSONString(axis)
+                , JSON.toJSONString(ncbscData)
+                , JSON.toJSONString(hencData)
+        );
     }
-
 }
+
+
+
+
+
+
