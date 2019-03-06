@@ -3,17 +3,15 @@ package com.axin.communication.service;
 import com.alibaba.fastjson.JSON;
 import com.axin.communication.algorithm.HcdiNcBsc;
 import com.axin.communication.dao.CommunicationDao;
-import com.axin.communication.domain.CommunicationData;
 import com.axin.communication.domain.TaskResult;
-import com.axin.communication.domain.enums.NetworkCodeTypeEnum;
 import com.axin.communication.tools.common.NetworkCodeTools;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.*;
 
 /**
  * @author axin
@@ -131,48 +129,6 @@ public class ComputePerformanceService {
             ncbscGData.add(NetworkCodeTools.computeGain(arq, ncbsc));
         }
 
-        //Dao
-        log.info("开始保存计算数据！");
-        Map<String, List<Double>> map = new HashMap<>();
-        map.put("arq", arqData);
-
-        map.put("ncwbr", ncwbrData);
-        map.put("ncwbrG", ncwbrGData);
-
-        map.put("oncsb", oncsbData);
-        map.put("oncsbG", oncsbGData);
-
-        map.put("oncmb", oncmbData);
-        map.put("oncmbG", oncmbGData);
-
-        map.put("hwner", hwnerData);
-        map.put("hwnerG", hwnerGData);
-
-        map.put("henc", hencData);
-        map.put("hencG", hencGData);
-
-        map.put("ncbsc", ncbscData);
-        map.put("ncbscG", ncbscGData);
-
-        CommunicationData data = new CommunicationData();
-        data.setAxis(axis);
-        data.setValue(map);
-        data.setCreatDate(new Date());
-        data.setNetworkCodeType(NetworkCodeTypeEnum.NUMBER);
-
-        Map<String, String> param = new HashMap<>();
-        param.put("接收端数量", "2-12:1");
-        param.put("总传输包数", packetNumber + "");
-        param.put("传输时间间隔", interval + "");
-        param.put("链路丢包率", packetLoss + "");
-        param.put("实验重复次数", times + "");
-        param.put("ncbsb参数", "采用约定参数");
-
-        data.setParam(param);
-        communicationDao.addData(data);
-        log.info("保存成功！");
-
-
         //Log
         log.info("基本参数：（接收端数量：{}），（总传输数据包数：{}，（传输时间间隔：{}），（链路丢包率：{}），（实验重复次数：{}）",
                 number, packetNumber, interval, packetLoss, times);
@@ -283,47 +239,6 @@ public class ComputePerformanceService {
             ncbscGData.add(NetworkCodeTools.computeGain(arq, ncbsc));
         }
 
-        //Dao
-        log.info("开始保存计算数据！");
-        Map<String, List<Double>> map = new HashMap<>();
-        map.put("arq", arqData);
-
-        map.put("ncwbr", ncwbrData);
-        map.put("ncwbrG", ncwbrGData);
-
-        map.put("oncsb", oncsbData);
-        map.put("oncsbG", oncsbGData);
-
-        map.put("oncmb", oncmbData);
-        map.put("oncmbG", oncmbGData);
-
-        map.put("hwner", hwnerData);
-        map.put("hwnerG", hwnerGData);
-
-        map.put("henc", hencData);
-        map.put("hencG", hencGData);
-
-        map.put("ncbsc", ncbscData);
-        map.put("ncbscG", ncbscGData);
-
-        CommunicationData data = new CommunicationData();
-        data.setAxis(axis);
-        data.setValue(map);
-        data.setCreatDate(new Date());
-        data.setNetworkCodeType(NetworkCodeTypeEnum.PACKETLOSS);
-
-        Map<String, String> param = new HashMap<>();
-        param.put("接收端数量", number + "");
-        param.put("总传输包数", packetNumber + "");
-        param.put("传输时间间隔", interval + "");
-        param.put("链路丢包率", "0.05-0.30:0.05");
-        param.put("实验重复次数", times + "");
-        param.put("ncbsb参数", "采用约定参数");
-
-        data.setParam(param);
-        communicationDao.addData(data);
-        log.info("保存成功！");
-
 
         //Log
         log.info("基本参数：（接收端数量：{}），（总传输数据包数：{}，（传输时间间隔：{}），（链路丢包率：{}），（实验重复次数：{}）",
@@ -398,34 +313,6 @@ public class ComputePerformanceService {
 //            theoryData.add(theory);
         }
 
-        //Dao
-        log.info("开始保存计算数据！");
-        Map<String, List<Double>> map = new HashMap<>();
-        map.put("arq", arqData);
-
-        map.put("ncbsc", ncbscData);
-        map.put("ncbscG", ncbscGData);
-//        map.put("theory", theoryData);
-
-
-        CommunicationData data = new CommunicationData();
-        data.setAxis(axis);
-        data.setValue(map);
-        data.setCreatDate(new Date());
-        data.setNetworkCodeType(NetworkCodeTypeEnum.CACHE);
-
-        Map<String, String> param = new HashMap<>();
-        param.put("接收端数量", number + "");
-        param.put("总传输包数", packetNumber + "");
-        param.put("传输时间间隔", interval + "");
-        param.put("链路丢包率", packetLoss + "");
-        param.put("实验重复次数", times + "");
-        param.put("ncbsb参数", "缓存大小10-100:5变化");
-
-        data.setParam(param);
-        communicationDao.addData(data);
-        log.info("保存成功！");
-
         //Log
         log.info("\n" +
                         "X轴的数值为{}\n" +
@@ -499,33 +386,6 @@ public class ComputePerformanceService {
             ncbscGData.add(NetworkCodeTools.computeGain(arq, ncbsc));
         }
 
-        //Dao
-        log.info("开始保存计算数据！");
-        Map<String, List<Double>> map = new HashMap<>();
-        map.put("arq", arqData);
-
-        map.put("ncbsc", ncbscData);
-        map.put("ncbscG", ncbscGData);
-        map.put("ttlTimes", ttlTimesData);
-
-        CommunicationData data = new CommunicationData();
-        data.setAxis(axis);
-        data.setValue(map);
-        data.setCreatDate(new Date());
-        data.setNetworkCodeType(NetworkCodeTypeEnum.TTL);
-
-        Map<String, String> param = new HashMap<>();
-        param.put("接收端数量", number + "");
-        param.put("总传输包数", packetNumber + "");
-        param.put("传输时间间隔", interval + "");
-        param.put("链路丢包率", packetLoss + "");
-        param.put("实验重复次数", times + "");
-        param.put("ncbsb参数", "TTL 10-200:10变化");
-
-        data.setParam(param);
-        communicationDao.addData(data);
-        log.info("保存成功！");
-
         //Log
         log.info("\n" +
                         "X轴的数值为{}\n" +
@@ -549,7 +409,7 @@ public class ComputePerformanceService {
     }
 
     /**
-     * 5.1 TTL10-100:10变化，得出TTL变化与重传时延关系
+     * 5.1 TTL10-200:10变化，得出TTL变化与重传时延关系
      * 5.2 henc与ncbsc时延对比
      */
     public void computePerformanceWithDelay(int number, int packetNumber, int interval, double packetLoss, int times) {
@@ -576,30 +436,6 @@ public class ComputePerformanceService {
             hencData.add(henc);
         }
 
-        //Dao
-        log.info("开始保存计算数据！");
-        Map<String, List<Double>> map = new HashMap<>();
-
-        map.put("ncbsc", ncbscData);
-        map.put("henc", hencData);
-
-        CommunicationData data = new CommunicationData();
-        data.setAxis(axis);
-        data.setValue(map);
-        data.setCreatDate(new Date());
-        data.setNetworkCodeType(NetworkCodeTypeEnum.TTL);
-
-        Map<String, String> param = new HashMap<>();
-        param.put("接收端数量", number + "");
-        param.put("总传输包数", packetNumber + "");
-        param.put("传输时间间隔", interval + "");
-        param.put("链路丢包率", packetLoss + "");
-        param.put("实验重复次数", times + "");
-        param.put("ncbsb参数", "TTL 10-200:10变化");
-
-        data.setParam(param);
-        communicationDao.addData(data);
-        log.info("保存成功！");
 
         //Log
         log.info("\n" +
@@ -612,9 +448,3 @@ public class ComputePerformanceService {
         );
     }
 }
-
-
-
-
-
-
