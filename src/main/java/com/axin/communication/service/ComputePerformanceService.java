@@ -11,6 +11,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -21,6 +22,9 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class ComputePerformanceService {
+
+    @Value("${networkcode.promote}")
+    private double promote;
 
     @Autowired
     @Qualifier("arqService")
@@ -371,7 +375,8 @@ public class ComputePerformanceService {
 
             //重复实验
             for (int j = 0; j < times; j++) {
-                TaskResult result = hcdiNcBsc.getBandWithAndDelay(number, packetNumber, packetLoss, 10, i, 50, 10, 1);
+                TaskResult result = hcdiNcBsc
+                    .getBandWithAndDelay(number, packetNumber, packetLoss, 10, i, 50, 10, promote);
                 ncbsc += NetworkCodeTools.computeBandwidth(result.getReNumber(), packetNumber);
                 ttlTimes += result.getTtlTimes();
                 cacheOverTimes += result.getCacheOverflow();
@@ -427,7 +432,8 @@ public class ComputePerformanceService {
             ncbsc = 0;
             axis.add(new Double(i));
             for (int j = 0; j < times; j++) {
-                TaskResult result = hcdiNcBsc.getBandWithAndDelay(number, packetNumber, packetLoss, 10, i, 50, 10, 1);
+                TaskResult result = hcdiNcBsc
+                    .getBandWithAndDelay(number, packetNumber, packetLoss, 10, i, 50, 10, promote);
                 ncbsc += result.getDelay();
             }
             henc = hencDelayService.computeDelay(number, packetNumber, interval, packetLoss, times);

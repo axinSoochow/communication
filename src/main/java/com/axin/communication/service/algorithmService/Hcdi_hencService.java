@@ -8,6 +8,7 @@ import com.axin.communication.tools.common.NetworkCodeTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service("hencService")
@@ -18,12 +19,17 @@ public class Hcdi_hencService implements ComputeTBService, ComputeDelayService {
     @Qualifier("hcdi-henc")
     private NetworkCode hcdihenc;
 
+    @Value("${networkcode.promote}")
+    private double promote;
+
     @Override
     public double computeTB(int number, int packetNumber, int interval, double packetLoss, int times) {
         double bandWith = 0;
         for (int i = 0; i < times; i++) {
             //采用次方法计算则传输时间间隔为总传输包数量大小一致
-            bandWith += NetworkCodeTools.getCommonBandwidth(hcdihenc, number, packetNumber, packetNumber, packetLoss, 1);
+            bandWith += NetworkCodeTools
+                .getCommonBandwidth(hcdihenc, number, packetNumber, packetNumber, packetLoss,
+                    promote);
         }
         return NetworkCodeTools.computeDivide(bandWith, times);
     }
@@ -58,7 +64,8 @@ public class Hcdi_hencService implements ComputeTBService, ComputeDelayService {
 
             MPEM = DelayTools.delayMPEM2MPEM(delayMPEM);
             int[] codePacket = hcdihenc.getCodePacket(MPEM);
-            delayMPEM = NetworkCodeTools.decodeProcess(delayMPEM, codePacket, packetLoss, 1, true);
+            delayMPEM = NetworkCodeTools
+                .decodeProcess(delayMPEM, codePacket, packetLoss, promote, true);
             delay += DelayTools.computeDelay(delayMPEM);
             //增加时延
             DelayTools.addDelay(delayMPEM);

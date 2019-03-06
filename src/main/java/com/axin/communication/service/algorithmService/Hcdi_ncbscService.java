@@ -37,6 +37,8 @@ public class Hcdi_ncbscService implements ComputeTBService, InitializingBean {
     @Autowired
     private HcdiNcBsc hcdiNcBsc;
 
+    @Value("${networkcode.promote}")
+    private double promote;
 
     public Hcdi_ncbscService() {
         hcdiNcBsc = new HcdiNcBsc();
@@ -54,9 +56,9 @@ public class Hcdi_ncbscService implements ComputeTBService, InitializingBean {
 
         for (int i = 0; i < times; i++) {
             if (interval != 0) {
-                result = hcdiNcBsc.getBandWithAndDelay(number, packetNumber, packetLoss, originalPacket, timeToLive, interval, nextPacket, 1);
+                result = hcdiNcBsc.getBandWithAndDelay(number, packetNumber, packetLoss, originalPacket, timeToLive, interval, nextPacket, promote);
             } else {
-                result = hcdiNcBsc.getBandWithAndDelay(number, packetNumber, packetLoss, originalPacket, timeToLive, cacheThreshold, nextPacket, 1);
+                result = hcdiNcBsc.getBandWithAndDelay(number, packetNumber, packetLoss, originalPacket, timeToLive, cacheThreshold, nextPacket, promote);
             }
             bandWith += NetworkCodeTools.computeDivide(result.getReNumber() + packetNumber, packetNumber);
         }

@@ -12,6 +12,7 @@ networkcode:
   interval: 50          # 传输时间间隔
   packetLoss: 0.20      # 链路丢包率
   times: 50             # 实验重复次数
+  promote: 0            # 重传传输成功率较先前提高百分比
   hcdi:
     originalPacket: 10  # 初始发包数
     timeToLive: 1000    # TTL
