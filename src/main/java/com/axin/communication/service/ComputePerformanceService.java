@@ -1,7 +1,7 @@
 package com.axin.communication.service;
 
 import com.alibaba.fastjson.JSON;
-import com.axin.communication.algorithm.HcdiNcBsc;
+import com.axin.communication.algorithm.NcdiNcBsc;
 import com.axin.communication.dao.CommunicationDao;
 import com.axin.communication.domain.TaskResult;
 import com.axin.communication.tools.common.NetworkCodeTools;
@@ -58,7 +58,7 @@ public class ComputePerformanceService {
     private ComputeTBService ncbscService;
 
     @Autowired
-    private HcdiNcBsc hcdiNcBsc;
+    private NcdiNcBsc hcdiNcBsc;
 
     @Autowired
     private CommunicationDao communicationDao;

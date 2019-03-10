@@ -1,6 +1,6 @@
 package com.axin.communication.service.algorithmService;
 
-import com.axin.communication.algorithm.HcdiNcBsc;
+import com.axin.communication.algorithm.NcdiNcBsc;
 import com.axin.communication.domain.TaskResult;
 import com.axin.communication.service.ComputeTBService;
 import com.axin.communication.tools.common.NetworkCodeTools;
@@ -35,13 +35,13 @@ public class Hcdi_ncbscService implements ComputeTBService, InitializingBean {
     private int nextPacket;
 
     @Autowired
-    private HcdiNcBsc hcdiNcBsc;
+    private NcdiNcBsc hcdiNcBsc;
 
     @Value("${networkcode.promote}")
     private double promote;
 
     public Hcdi_ncbscService() {
-        hcdiNcBsc = new HcdiNcBsc();
+        hcdiNcBsc = new NcdiNcBsc();
     }
 
     @Override

@@ -64,7 +64,7 @@ public class HcdiNcBscTest extends BaseTest {
 
     @Test
     public void hcdiNcBsc() {
-        HcdiNcBsc hcdiNcBsc = new HcdiNcBsc();
+        NcdiNcBsc hcdiNcBsc = new NcdiNcBsc();
         TaskResult result = hcdiNcBsc.getBandWithAndDelay(5, 100, 0.4, 10, 10, 20, 5, 1);
         log.info(result.toString());
     }
