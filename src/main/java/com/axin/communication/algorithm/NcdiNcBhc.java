@@ -20,7 +20,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class NcdiNcBsc {
+public class NcdiNcBhc {
 
     /**
      * @param numebr
