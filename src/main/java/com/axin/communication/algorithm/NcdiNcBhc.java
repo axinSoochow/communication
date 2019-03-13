@@ -269,7 +269,12 @@ public class NcdiNcBhc {
      */
     private int[][] deleteZero(int[][] delayMPEM) {
         int n = delayMPEM.length;
-        int m = delayMPEM[0].length;
+        int m = 0;
+        try {
+            m = delayMPEM[0].length;
+        } catch (Exception e) {
+            return new int[][]{};
+        }
         List<Integer> target = new ArrayList<>();
 
         //寻找非零列

@@ -226,6 +226,16 @@ public class NetworkCodeTools {
     }
 
     /**
+     * 计算log函数
+     * @param value 值
+     * @param base 底数
+     * @return
+     */
+    public static double computeLog(double value, double base) {
+        return Math.log(value) / Math.log(base);
+    }
+
+    /**
      * 得到丢失包个数
      *
      * @param delayMEPM
@@ -250,7 +260,8 @@ public class NetworkCodeTools {
      * @return
      */
     public static double computeGain(double arq, double networkcode) {
-        double ratio = NetworkCodeTools.computeDivide((arq - networkcode), arq);
+        double ratio = 10*NetworkCodeTools.computeLog(arq/networkcode,10);
+        ratio = (double) Math.round(ratio * 100) / 100;
         return ratio;
     }
 

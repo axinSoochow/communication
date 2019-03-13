@@ -376,7 +376,7 @@ public class ComputePerformanceService {
             //重复实验
             for (int j = 0; j < times; j++) {
                 TaskResult result = hcdiNcBsc
-                    .getBandWithAndDelay(number, packetNumber, packetLoss, 10, i, 50, 10, promote);
+                    .getBandWithAndDelay(number, packetNumber, packetLoss, 10, i, 50, 1, promote);
                 ncbsc += NetworkCodeTools.computeBandwidth(result.getReNumber(), packetNumber);
                 ttlTimes += result.getTtlTimes();
                 cacheOverTimes += result.getCacheOverflow();
