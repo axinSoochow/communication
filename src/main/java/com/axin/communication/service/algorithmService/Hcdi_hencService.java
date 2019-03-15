@@ -36,7 +36,7 @@ public class Hcdi_hencService implements ComputeTBService, ComputeDelayService {
 
     @Override
     public double computeDelay(int number, int packetNumber, int interval, double packetLoss, int times) {
-        int sum = 0;
+        double sum = 0;
 
         for (int i = 0; i < times; i++) {
             sum += getDelay(number, packetNumber, interval, packetLoss);
@@ -53,13 +53,13 @@ public class Hcdi_hencService implements ComputeTBService, ComputeDelayService {
      * @param packetLoss
      * @return
      */
-    private int getDelay(int number, int packetNumber, int interval, double packetLoss) {
+    private double getDelay(int number, int packetNumber, int interval, double packetLoss) {
 
         int delay = 0;
         int[][] MPEM;
         int[][] delayMPEM = NetworkCodeTools.creatDelayMPEM(number, packetNumber, packetLoss);
         delayMPEM = DelayTools.deleteZero(delayMPEM);
-
+        int lossPacket = delayMPEM[0].length;
         while (NetworkCodeTools.getRestPacket(delayMPEM) != 0) {
 
             MPEM = DelayTools.delayMPEM2MPEM(delayMPEM);
@@ -71,7 +71,6 @@ public class Hcdi_hencService implements ComputeTBService, ComputeDelayService {
             DelayTools.addDelay(delayMPEM);
             delayMPEM = DelayTools.deleteZero(delayMPEM);
         }
-        return delay;
+        return NetworkCodeTools.computeDivide(delay,lossPacket);
     }
-
 }

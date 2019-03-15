@@ -5,11 +5,10 @@ import com.axin.communication.domain.TaskResult;
 import com.axin.communication.tools.common.DelayTools;
 import com.axin.communication.tools.common.MatrixTools;
 import com.axin.communication.tools.common.NetworkCodeTools;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 /**
  * 配备双接口的网络编码场景Network coding for dual interface,NCDI</br>
@@ -54,7 +53,9 @@ public class NcdiNcBhc {
         //重传次数
         int reNumber = 0;
         //重传时延
-        int delay = 0;
+        double delay = 0;
+        //丢包总数
+        int lossPacket = originalPacket;
         //缓存溢出次数
         int cacheOverflow = 0;
         //ttl超时次数
@@ -159,14 +160,13 @@ public class NcdiNcBhc {
             packetNumber -= nextPacket;
             if (packetNumber > 0) {
                 delayMPEM = NetworkCodeTools.creatDelayMPEM(numebr, nextPacket, packetLoss);
+                //记录丢包数
+                lossPacket += computelossPacket(delayMPEM);
             } else {
                 delayMPEM = NetworkCodeTools.creatDelayMPEM(numebr, packetNumber + nextPacket, packetLoss);
             }
-
         }
-//        log.info("TTL共超时{}次", ttlTimes);
-//        log.info("缓存溢出共{}次", cacheOverflow);
-//        log.info("重传次数共{}次", reNumber);
+        delay = NetworkCodeTools.computeDivide(delay, lossPacket);
         return new TaskResult(reNumber, delay, ttlTimes, cacheOverflow);
     }
 
@@ -198,6 +198,24 @@ public class NcdiNcBhc {
         }
 
         return true;
+    }
+
+    /**
+     * 统计丢包个数
+     */
+    public int computelossPacket(int[][] delayMPEM) {
+        int res = 0;
+        int row = delayMPEM.length;
+        int col = delayMPEM[0].length;
+        for (int i = 0; i < col; i++) {
+            for (int j = 0; j < row; j++) {
+                if (delayMPEM[j][i] == 1) {
+                    res++;
+                    break;
+                }
+            }
+        }
+        return res;
     }
 
     /**

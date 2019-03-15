@@ -2,7 +2,6 @@ package com.axin.communication.service;
 
 import com.alibaba.fastjson.JSON;
 import com.axin.communication.algorithm.NcdiNcBhc;
-import com.axin.communication.dao.CommunicationDao;
 import com.axin.communication.domain.TaskResult;
 import com.axin.communication.tools.common.NetworkCodeTools;
 import java.math.BigDecimal;
@@ -25,6 +24,9 @@ public class ComputePerformanceService {
 
     @Value("${networkcode.promote}")
     private double promote;
+
+    @Value("${networkcode.hcdi.originalPacket}")
+    private int orginalPacket;
 
     @Autowired
     @Qualifier("arqService")
@@ -59,9 +61,6 @@ public class ComputePerformanceService {
 
     @Autowired
     private NcdiNcBhc hcdiNcBsc;
-
-    @Autowired
-    private CommunicationDao communicationDao;
 
 
     /**
@@ -173,7 +172,7 @@ public class ComputePerformanceService {
     }
 
     /**
-     * 2.1 链路丢包率0.1-0.30:0.1变化，得出丢包率变化与传输带宽关系图
+     * 2.1 丢包率变化与传输带宽关系图
      * 2.2 对应的编码增益图
      */
     public void computePerformanceWithPacketLossChange(int number, int packetNumber, int interval, double packetLoss, int times) {
@@ -206,9 +205,8 @@ public class ComputePerformanceService {
         double henc;
         double ncbsc;
 
-
-        log.info("开始计算：链路丢包率变化0.05-0.30:0.05与传输带宽关系");
-        for (int i = 5; i <= 30; i += 5) {
+        log.info("开始计算：链路丢包率变化0.02-0.20:0.01与传输带宽关系");
+        for (int i = 2; i <= 20; i += 1) {
 
             //处理double类型的链路丢包率
             packetLoss = new BigDecimal(new Double(i)).divide(new BigDecimal(100)).doubleValue();
@@ -288,50 +286,98 @@ public class ComputePerformanceService {
      * 3 缓存大小10-100:5变化，得出缓存大小变化与传输带宽关系图
      */
     public void computePerformanceWithCacheChange(int number, int packetNumber, int interval, double packetLoss, int times) {
+        int number5 = 5;
+        int number10 = 10;
+        double packetLoss01 = 0.1;
+        double packetLoss02 = 0.2;
+
         //0.x轴
         List<Double> axis = new ArrayList<>();
 
-        List<Double> arqData = new ArrayList<>();
-        List<Double> ncbscData = new ArrayList<>();
-        List<Double> theoryData = new ArrayList<>();
+        List<Double> arqData51 = new ArrayList<>();
+        List<Double> arqData52 = new ArrayList<>();
+        List<Double> arqData101 = new ArrayList<>();
+        List<Double> arqData102 = new ArrayList<>();
 
-        List<Double> ncbscGData = new ArrayList<>();
+        List<Double> ncbhcData51 = new ArrayList<>();
+        List<Double> ncbhcData52 = new ArrayList<>();
+        List<Double> ncbhcData101 = new ArrayList<>();
+        List<Double> ncbhcData102 = new ArrayList<>();
 
-        double arq;
-        double ncbsc;
-        double theory = NetworkCodeTools.computeTheoryBandWith(packetLoss);
+        List<Double> theoryData01 = new ArrayList<>();
+        List<Double> theoryData02 = new ArrayList<>();
+
+        double arqN5P01;
+        double arqN5P02;
+        double arqN10P01;
+        double arqN10P02;
+
+        double ncbhcN5P01;
+        double ncbhcN5P02;
+        double ncbhcN10P01;
+        double ncbhcN10P02;
+
+        double theory01 = NetworkCodeTools.computeTheoryBandWith(packetLoss01);
+        double theory02 = NetworkCodeTools.computeTheoryBandWith(packetLoss02);
 
         log.info("开始计算：缓存大小10-100:5变化，得出缓存大小变化与传输带宽关系");
         for (int i = 10; i <= 100; i += 5) {
             axis.add(new Double(i));
 
             //1.arq
-            arq = arqService.computeTB(number, packetNumber, interval, packetLoss, times);
-            arqData.add(arq);
+            arqN5P01 = arqService.computeTB(number5, packetNumber, interval, packetLoss01, times);
+            arqData51.add(arqN5P01);
 
-            ncbsc = ncbscService.computeTB(number, packetNumber, i, packetLoss, times);
-            ncbscData.add(ncbsc);
-            ncbscGData.add(NetworkCodeTools.computeGain(arq, ncbsc));
+            arqN5P02 = arqService.computeTB(number5, packetNumber, interval, packetLoss02, times);
+            arqData52.add(arqN5P02);
+
+            arqN10P01 = arqService.computeTB(number10, packetNumber, interval, packetLoss01, times);
+            arqData101.add(arqN10P01);
+
+            arqN10P02 = arqService.computeTB(number10, packetNumber, interval, packetLoss02, times);
+            arqData102.add(arqN10P02);
+
+            //2.ncbhc
+            ncbhcN5P01 = ncbscService.computeTB(number5, packetNumber, i, packetLoss01, times);
+            ncbhcData51.add(ncbhcN5P01);
+
+            ncbhcN5P02 = ncbscService.computeTB(number5, packetNumber, i, packetLoss02, times);
+            ncbhcData52.add(ncbhcN5P02);
+
+            ncbhcN10P01 = ncbscService.computeTB(number10, packetNumber, i, packetLoss01, times);
+            ncbhcData101.add(ncbhcN10P01);
+
+            ncbhcN10P02 = ncbscService.computeTB(number10, packetNumber, i, packetLoss02, times);
+            ncbhcData102.add(ncbhcN10P02);
 
             //理论
-//            theoryData.add(theory);
+            theoryData01.add(theory01);
+            theoryData02.add(theory02);
         }
-
         //Log
         log.info("\n" +
-                        "X轴的数值为{}\n" +
-                        "arq数据为{}\n" +
-                        "ncbsc数据为{}"
-                , JSON.toJSONString(axis)
-                , JSON.toJSONString(arqData)
-                , JSON.toJSONString(ncbscData)
-        );
-
-        log.info("\n" +
-                        "X轴数值为{}\n" +
-                        "ncbsc增益数据为{}"
-                , JSON.toJSONString(axis)
-                , JSON.toJSONString(ncbscGData)
+                "X轴的数值为{}\n" +
+                "arq51数据为{}\n" +
+                "arq52数据为{}\n" +
+                "arq101数据为{}\n" +
+                "arq102数据为{}\n" +
+                "ncbhc51数据为{}\n" +
+                "ncbhc52数据为{}\n" +
+                "ncbhc101数据为{}\n" +
+                "ncbhc102数据为{}\n" +
+                "理论01数据为{}\n" +
+                "理论02数据为{}"
+            , JSON.toJSONString(axis)
+            , JSON.toJSONString(arqData51)
+            , JSON.toJSONString(arqData52)
+            , JSON.toJSONString(arqData101)
+            , JSON.toJSONString(arqData102)
+            , JSON.toJSONString(ncbhcData51)
+            , JSON.toJSONString(ncbhcData52)
+            , JSON.toJSONString(ncbhcData101)
+            , JSON.toJSONString(ncbhcData102)
+            , JSON.toJSONString(theoryData01)
+            , JSON.toJSONString(theoryData02)
         );
     }
 
@@ -342,75 +388,79 @@ public class ComputePerformanceService {
      * 4.4 对应缓存阈值触发次数
      */
     public void computePerformanceWithTTLChange(int number, int packetNumber, int interval, double packetLoss, int times) {
+        int number5 = 5;
+        int number10 = 10;
+        double packetLoss01 = 0.1;
+        double packetLoss02 = 0.2;
+
         //0.x轴
         List<Double> axis = new ArrayList<>();
 
-        List<Double> arqData = new ArrayList<>();
-        List<Double> ncbscData = new ArrayList<>();
+        //1.y轴
+        List<Double> ncbhcData51 = new ArrayList<>();
+        List<Double> ncbhcData52 = new ArrayList<>();
+        List<Double> ncbhcData101 = new ArrayList<>();
+        List<Double> ncbhcData102 = new ArrayList<>();
 
-
-        List<Double> ncbscGData = new ArrayList<>();
-        List<Double> ttlTimesData = new ArrayList<>();
-        List<Double> cacheOverTimesData = new ArrayList<>();
-
-
-        double arq;
-        double ncbsc;
-        double ttlTimes;
-        double cacheOverTimes;
-
+        double ncbhcN5P01;
+        double ncbhcN5P02;
+        double ncbhcN10P01;
+        double ncbhcN10P02;
 
         log.info("开始计算：TTL 10-200:10变化，得出TTL大小变化与传输带宽关系");
-        //细粒度控制ncbsc变量
-        for (int i = 10; i <= 50; i += 5) {
-            ncbsc = 0;
-            ttlTimes = 0;
-            cacheOverTimes = 0;
+        //细粒度控制ncbhc的ttl变量
+        for (int i = 10; i <= 200; i += 10) {
 
             axis.add(new Double(i));
 
-            //1.arq
-            arq = arqService.computeTB(number, packetNumber, interval, packetLoss, times);
-            arqData.add(arq);
+            //ncbhc计算
+            ncbhcN5P01 = computeNCBHC(number5, packetNumber, packetLoss01, orginalPacket,
+                packetNumber, i, promote, times);
+            ncbhcData51.add(ncbhcN5P01);
 
-            //重复实验
-            for (int j = 0; j < times; j++) {
-                TaskResult result = hcdiNcBsc
-                    .getBandWithAndDelay(number, packetNumber, packetLoss, 10, i, 50, 1, promote);
-                ncbsc += NetworkCodeTools.computeBandwidth(result.getReNumber(), packetNumber);
-                ttlTimes += result.getTtlTimes();
-                cacheOverTimes += result.getCacheOverflow();
-            }
-            ncbsc = NetworkCodeTools.computeDivide(ncbsc, times);
-            ttlTimes = NetworkCodeTools.computeDivide(new Double(ttlTimes), times);
-            cacheOverTimes = (int) NetworkCodeTools.computeDivide(new Double(cacheOverTimes), times);
+            ncbhcN5P02 = computeNCBHC(number5, packetNumber, packetLoss02, orginalPacket,
+                packetNumber, i, promote, times);
+            ncbhcData52.add(ncbhcN5P02);
 
-            ttlTimesData.add(ttlTimes);
-            cacheOverTimesData.add(cacheOverTimes);
-            ncbscData.add(ncbsc);
-            ncbscGData.add(NetworkCodeTools.computeGain(arq, ncbsc));
+            ncbhcN10P01 = computeNCBHC(number10, packetNumber, packetLoss01, orginalPacket,
+                packetNumber, i, promote, times);
+            ncbhcData101.add(ncbhcN10P01);
+
+            ncbhcN10P02 = computeNCBHC(number10, packetNumber, packetLoss02, orginalPacket,
+                packetNumber, i, promote, times);
+            ncbhcData102.add(ncbhcN10P02);
         }
 
         //Log
         log.info("\n" +
-                        "X轴的数值为{}\n" +
-                        "arq数据为{}\n" +
-                        "ncbsc数据为{}"
-                , JSON.toJSONString(axis)
-                , JSON.toJSONString(arqData)
-                , JSON.toJSONString(ncbscData)
+                "X轴的数值为{}\n" +
+                "ncbhc51数据为{}\n" +
+                "ncbhc512数据为{}\n" +
+                "ncbhc101数据为{}\n" +
+                "ncbhc102数据为{}\n"
+            , JSON.toJSONString(axis)
+            , JSON.toJSONString(ncbhcData51)
+            , JSON.toJSONString(ncbhcData52)
+            , JSON.toJSONString(ncbhcData101)
+            , JSON.toJSONString(ncbhcData102)
         );
+    }
 
-        log.info("\n" +
-                        "X轴数值为{}\n" +
-                        "ncbsc增益数据为{}\n" +
-                        "超时触发次数为{}\n" +
-                        "缓存阈值触发次数{}"
-                , JSON.toJSONString(axis)
-                , JSON.toJSONString(ncbscGData)
-                , JSON.toJSONString(ttlTimesData)
-                , JSON.toJSONString(cacheOverTimesData)
-        );
+    /**
+     * 重复计算返回平均传输次数的平均值
+     */
+    public double computeNCBHC(int number, int packetNumber, double packetLoss, int orginalPacket,
+        int cacheThreshold, int ttl, double promote, int times) {
+        //重复实验
+        double res = 0;
+        for (int j = 0; j < times; j++) {
+            TaskResult result = hcdiNcBsc
+                .getBandWithAndDelay(number, packetNumber, packetLoss, orginalPacket, ttl,
+                    cacheThreshold, 1, promote);
+            int reNumber = result.getReNumber();
+            res += NetworkCodeTools.computeBandwidth(reNumber, packetNumber);
+        }
+        return NetworkCodeTools.computeDivide(res, times);
     }
 
     /**
@@ -418,39 +468,106 @@ public class ComputePerformanceService {
      * 5.2 henc与ncbsc时延对比
      */
     public void computePerformanceWithDelay(int number, int packetNumber, int interval, double packetLoss, int times) {
+        int number5 = 5;
+        int number10 = 10;
+        double packetLoss01 = 0.1;
+        double packetLoss02 = 0.2;
+
         //0.x轴
         List<Double> axis = new ArrayList<>();
 
-        List<Double> ncbscData = new ArrayList<>();
-        List<Double> hencData = new ArrayList<>();
+        List<Double> hencData51 = new ArrayList<>();
+        List<Double> hencData52 = new ArrayList<>();
+        List<Double> hencData101 = new ArrayList<>();
+        List<Double> hencData102 = new ArrayList<>();
 
-        double ncbsc;
-        double henc;
+        List<Double> ncbhcData51 = new ArrayList<>();
+        List<Double> ncbhcData52 = new ArrayList<>();
+        List<Double> ncbhcData101 = new ArrayList<>();
+        List<Double> ncbhcData102 = new ArrayList<>();
 
-        //ncbsc
-        for (int i = 10; i <= 100; i += 10) {
-            ncbsc = 0;
+        double hencN5P01;
+        double hencN5P02;
+        double hencN10P01;
+        double hencN10P02;
+
+        double ncbhcN5P01;
+        double ncbhcN5P02;
+        double ncbhcN10P01;
+        double ncbhcN10P02;
+
+        log.info("开始计算：TTL 10-200:10变化，得出TTL大小变化与平均传输时延关系");
+        for (int i = 10; i <= 200; i += 10) {
             axis.add(new Double(i));
-            for (int j = 0; j < times; j++) {
-                TaskResult result = hcdiNcBsc
-                    .getBandWithAndDelay(number, packetNumber, packetLoss, 10, i, 50, 10, promote);
-                ncbsc += result.getDelay();
-            }
-            henc = hencDelayService.computeDelay(number, packetNumber, interval, packetLoss, times);
-            ncbsc = NetworkCodeTools.computeDivide(ncbsc, times);
-            ncbscData.add(ncbsc);
-            hencData.add(henc);
-        }
 
+            //1.henc
+            hencN5P01 = hencDelayService
+                .computeDelay(number5, packetNumber, interval, packetLoss01, times);
+            hencData51.add(hencN5P01);
+
+            hencN5P02 = hencDelayService
+                .computeDelay(number5, packetNumber, interval, packetLoss02, times);
+            hencData52.add(hencN5P02);
+
+            hencN10P01 = hencDelayService
+                .computeDelay(number10, packetNumber, interval, packetLoss01, times);
+            hencData101.add(hencN10P01);
+
+            hencN10P02 = hencDelayService
+                .computeDelay(number10, packetNumber, interval, packetLoss02, times);
+            hencData102.add(hencN10P02);
+
+            //2.ncbhd
+            ncbhcN5P01 = computeNCBHCDelay(number5, packetNumber, packetLoss01, orginalPacket,
+                packetNumber, i, promote, times);
+            ncbhcData51.add(ncbhcN5P01);
+
+            ncbhcN5P02 = computeNCBHCDelay(number5, packetNumber, packetLoss02, orginalPacket,
+                packetNumber, i, promote, times);
+            ncbhcData52.add(ncbhcN5P02);
+
+            ncbhcN10P01 = computeNCBHCDelay(number10, packetNumber, packetLoss01, orginalPacket,
+                packetNumber, i, promote, times);
+            ncbhcData101.add(ncbhcN10P01);
+
+            ncbhcN10P02 = computeNCBHCDelay(number10, packetNumber, packetLoss02, orginalPacket,
+                packetNumber, i, promote, times);
+            ncbhcData102.add(ncbhcN10P02);
+        }
 
         //Log
         log.info("\n" +
-                        "X轴数值为{}\n" +
-                        "ncbsc时延数据为{}\n" +
-                        "henc时延数据为{}"
-                , JSON.toJSONString(axis)
-                , JSON.toJSONString(ncbscData)
-                , JSON.toJSONString(hencData)
+                "X轴数值为{}\n" +
+                "henc51时延数据为{}\n" +
+                "henc52时延数据为{}\n" +
+                "henc101时延数据为{}\n" +
+                "henc102时延数据为{}\n" +
+                "ncbhc51时延数据为{}\n" +
+                "ncbhc52时延数据为{}\n" +
+                "ncbhc101时延数据为{}\n" +
+                "ncbhc102时延数据为{}\n"
+            , JSON.toJSONString(axis)
+            , JSON.toJSONString(hencData51)
+            , JSON.toJSONString(hencData52)
+            , JSON.toJSONString(hencData101)
+            , JSON.toJSONString(hencData102)
+            , JSON.toJSONString(ncbhcData51)
+            , JSON.toJSONString(ncbhcData52)
+            , JSON.toJSONString(ncbhcData101)
+            , JSON.toJSONString(ncbhcData102)
         );
+    }
+
+    public double computeNCBHCDelay(int number, int packetNumber, double packetLoss,
+        int orginalPacket, int cacheThreshold, int ttl, double promote, int times) {
+
+        double res = 0;
+        for (int j = 0; j < times; j++) {
+            TaskResult result = hcdiNcBsc
+                .getBandWithAndDelay(number, packetNumber, packetLoss, orginalPacket, ttl,
+                    cacheThreshold, 1, promote);
+            res += result.getDelay();
+        }
+        return NetworkCodeTools.computeDivide(res, times);
     }
 }

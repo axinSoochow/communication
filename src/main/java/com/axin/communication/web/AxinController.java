@@ -53,13 +53,13 @@ public class AxinController {
 
     @RequestMapping("/ttl")
     public String computeTTL() {
-        computePerformanceService.computePerformanceWithTTLChange(number, packetNumber, interval, packetLoss, 1);
+        computePerformanceService.computePerformanceWithTTLChange(number, packetNumber, interval, packetLoss, times);
         return "计算完毕！";
     }
 
     @RequestMapping("/delay")
     public String computeDelay() {
-        computePerformanceService.computePerformanceWithDelay(number, packetNumber, interval, packetLoss, 1);
+        computePerformanceService.computePerformanceWithDelay(number, packetNumber, interval, packetLoss, times);
         return "计算完毕！";
     }
 

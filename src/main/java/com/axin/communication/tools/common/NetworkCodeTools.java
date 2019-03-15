@@ -283,6 +283,7 @@ public class NetworkCodeTools {
 
     /**
      * 理论最优传输带宽消耗
+     * 1/1-max(Sp)
      *
      * @param packetLoss
      * @return

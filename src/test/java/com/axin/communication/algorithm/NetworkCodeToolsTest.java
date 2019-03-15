@@ -18,4 +18,10 @@ public class NetworkCodeToolsTest {
         int[][] delayMPEM = NetworkCodeTools.creatDelayMPEM(5, 10, 0.4);
         MatrixTools.printMatrix(delayMPEM);
     }
+
+    @Test
+    public void computeBandWith() {
+        int a = 100;
+        int b = 1000;
+    }
 }

@@ -18,7 +18,7 @@ public class MatrixToolsTest {
 
     @Test
     public void name2() {
-        String str = "1.52,1.44,1.4,1.37,1.37,1.36,1.35,1.34,1.34,1.33";
+        String str = "1.46,1.38,1.35,1.33,1.32,1.31,1.3,1.3,1.29,1.29,1.29,1.29,1.28,1.28,1.28,1.28,1.28,1.28,1.28,1.28";
         MatrixTools.StringToData(str);
     }
 }

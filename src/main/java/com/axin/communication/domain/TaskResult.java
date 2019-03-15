@@ -17,7 +17,7 @@ public class TaskResult {
     /**
      * 计算的总时延
      */
-    private int delay;
+    private double delay;
 
     /**
      * ttl超时次数
