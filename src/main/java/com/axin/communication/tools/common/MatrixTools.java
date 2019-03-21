@@ -1,6 +1,7 @@
 package com.axin.communication.tools.common;
 
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -81,7 +82,7 @@ public class MatrixTools {
     }
 
     /**
-     * List结构转换为数据结构
+     * List结构转换为数组结构
      *
      * @param list
      * @return
@@ -99,5 +100,25 @@ public class MatrixTools {
         for (String data : datas) {
             System.out.println(data);
         }
+    }
+
+    public static int getMaxFormList(List<Integer> integerList) {
+        if (integerList.isEmpty()) {
+            return 0;
+        }
+        Collections.sort(integerList);
+        Collections.reverse(integerList);
+        return integerList.get(0);
+    }
+
+    //判断矩阵是否为null矩阵
+    public static boolean isNullMatrix(int[][] matrix) {
+        try {
+            int a = matrix.length;
+            int b = matrix[0].length;
+        } catch (Exception e) {
+            return true;
+        }
+        return false;
     }
 }

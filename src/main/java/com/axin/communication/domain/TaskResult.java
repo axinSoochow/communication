@@ -15,14 +15,14 @@ public class TaskResult {
      */
     private int reNumber;
     /**
-     * 计算的总时延
+     * 平均传输时延
      */
     private double delay;
 
     /**
-     * ttl超时次数
+     * 平均信令损耗
      */
-    private int ttlTimes;
+    private double signalLoss;
 
     /**
      * 缓存溢出次数

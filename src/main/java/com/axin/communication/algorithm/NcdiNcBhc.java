@@ -5,10 +5,11 @@ import com.axin.communication.domain.TaskResult;
 import com.axin.communication.tools.common.DelayTools;
 import com.axin.communication.tools.common.MatrixTools;
 import com.axin.communication.tools.common.NetworkCodeTools;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 配备双接口的网络编码场景Network coding for dual interface,NCDI</br>
@@ -58,8 +59,6 @@ public class NcdiNcBhc {
         int lossPacket = originalPacket;
         //缓存溢出次数
         int cacheOverflow = 0;
-        //ttl超时次数
-        int ttlTimes = 0;
 
         //发一组初始包
         packetNumber -= originalPacket;
@@ -81,7 +80,6 @@ public class NcdiNcBhc {
                 int[] codePacket;
                 if (delayMPEMCache[delayIndex][0] >= timeToLive) {
 
-                    ttlTimes++;
                     codePacket = findTTLPacket(delayMPEMCache, hashcode);
 //                    log.info("获得TTL编码包");
 //                    System.out.println(Arrays.toString(codePacket));
@@ -167,7 +165,7 @@ public class NcdiNcBhc {
             }
         }
         delay = NetworkCodeTools.computeDivide(delay, lossPacket);
-        return new TaskResult(reNumber, delay, ttlTimes, cacheOverflow);
+        return new TaskResult(reNumber, delay, 0, cacheOverflow);
     }
 
     /**
