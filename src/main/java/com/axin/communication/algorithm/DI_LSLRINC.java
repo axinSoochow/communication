@@ -19,11 +19,8 @@ import java.util.List;
 @Service
 public class DI_LSLRINC {
 
-    public static void main(String[] args) {
-    }
-
     public TaskResult getPerformance(int number, int packetNumber, double packetLoss, int threshold,
-                                     int timeToLive, double promote) {
+                                     int timeToLive) {
 
         int[][] delayMPEM;
         int[][] nextPacket;
@@ -36,8 +33,6 @@ public class DI_LSLRINC {
         //信令损耗
         int signalNumber = 0;
 
-        //各个终端丢包数
-        List<Integer> terminalLossPacket;
         //执行多播重传解码步骤Flag
         boolean decodeFlag = false;
 
@@ -58,7 +53,7 @@ public class DI_LSLRINC {
             }
 
             //2.2 TTL是否超时
-            DelayTools.deleteZero(delayMPEM);
+            delayMPEM = DelayTools.deleteZero(delayMPEM);
             try {
                 if (delayMPEM[0].length >= timeToLive) {
                     //执行多播编解码步骤
@@ -99,14 +94,16 @@ public class DI_LSLRINC {
             //4.2 数据包未传输完毕-生成下一个数据包-增加数据包时延
             DelayTools.addDelay(delayMPEM);
             nextPacket = NetworkCodeTools.creatDelayMPEM(number, 1, packetLoss);
+            packetNumber--;
             if (isLossPacket(nextPacket)) {
                 lossPacket++;
             }
             delayMPEM = MatrixTools.jointMatrix(delayMPEM, nextPacket);
         }
         // 返回性能参数
+//        System.out.println("累计性能参数重传次数" + reNumber + " 累计信令：" + signalNumber + " 累计时延：" + delay);
         double aveDelay = NetworkCodeTools.computeDivide(delay, lossPacket);
-        double aveSignalNumber = NetworkCodeTools.computeDivide(signalNumber, number * lossPacket);
+        double aveSignalNumber = NetworkCodeTools.computeDivide(lossPacket, signalNumber);
         TaskResult result = new TaskResult();
         result.setReNumber(reNumber);
         result.setDelay(aveDelay);
@@ -142,7 +139,7 @@ public class DI_LSLRINC {
         int signalLoss = number;
         //时延
         int delay = computeDelay(delayMPEM, MatrixTools.getMaxFormList(reNumberList));
-        return new Result(reNumber, signalLoss, delay);
+        return new Result(reNumber, delay, signalLoss);
     }
 
     //是否发生丢包
@@ -157,6 +154,10 @@ public class DI_LSLRINC {
 
     //终端丢包最大数是否达到阈值
     private boolean isThreshold(int[][] delayMPEM, int threshold) {
+        if (MatrixTools.isNullMatrix(delayMPEM)) {
+            return false;
+        }
+
         List<Integer> terminalLossPacket = getTerminalLossPacket(delayMPEM);
         int max = MatrixTools.getMaxFormList(terminalLossPacket);
         if (max >= threshold) {
@@ -188,7 +189,7 @@ public class DI_LSLRINC {
         int row = delayMPEM.length;
         int col = delayMPEM[0].length;
         for (int i = 0; i < col; i++) {
-            delay += delayMPEM[row - 1][col];
+            delay += delayMPEM[row - 1][i];
         }
         delay += reNumber * col;
         return delay;
@@ -197,7 +198,7 @@ public class DI_LSLRINC {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    class Result {
+    private class Result {
         //重传次数
         private int reNumber;
         //时延

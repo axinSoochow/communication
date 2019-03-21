@@ -87,10 +87,16 @@ public class DelayTools {
      * 矩阵剪枝
      */
     public static int[][] deleteZero(int[][] delayMPEM) {
-        int n = delayMPEM.length;
-        int m = delayMPEM[0].length;
-        List<Integer> target = new ArrayList<>();
+        int n;
+        int m;
+        try {
+            n = delayMPEM.length;
+            m = delayMPEM[0].length;
+        } catch (Exception e) {
+            return new int[][]{};
+        }
 
+        List<Integer> target = new ArrayList<>();
         //寻找非零列
         for (int i = 0; i < m; i++) {
             int code = 0;
