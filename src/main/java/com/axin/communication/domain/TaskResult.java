@@ -20,7 +20,7 @@ public class TaskResult {
     private double delay;
 
     /**
-     * 平均信令损耗
+     * 系统信令效率
      */
     private double signalLoss;
 

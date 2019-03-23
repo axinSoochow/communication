@@ -63,6 +63,36 @@ public class AxinController {
         return "计算完毕！";
     }
 
+    /**
+     * 计算LSLRINC编码阈值变化下——平均传输次数
+     * @return
+     */
+    @RequestMapping("/thresholdLSL")
+    public String computeTBAboutLSLRINCWithThreshold() {
+        computePerformanceService.computeLSLRINCTBWithThreshold(number, packetNumber, interval, packetLoss, times);
+        return "计算完毕！";
+    }
+
+    /**
+     * 计算LSLRINC的TTL变化下——平均传输次数
+     * @return
+     */
+    @RequestMapping("/ttlLSL")
+    public String computeTBWithLSLTTLChange() {
+        computePerformanceService.computeLSLRINCWithTTL(number, packetNumber, interval, packetLoss, times);
+        return "计算完毕！";
+    }
+
+
+    /**
+     * 计算LSLRINC 与ARQ、NCBHC方法的信令效率比较
+     * @return
+     */
+    @RequestMapping("/signalLoss")
+    public String computeSignalWithNumberChange() {
+        computePerformanceService.computeSignalLossWithNumber(number, packetNumber, interval, packetLoss, times);
+        return "计算完毕！";
+    }
 }
 
 

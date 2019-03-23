@@ -10,11 +10,14 @@ networkcode:
   number: 7             # 接受端数量
   packetNumber: 1000    # 总共传输数据包个数
   interval: 50          # 传输时间间隔
-  packetLoss: 0.15      # 链路丢包率
-  times: 100             # 实验重复次数
+  packetLoss: 0.25      # 链路丢包率
+  times: 100            # 实验重复次数
   promote: 0            # 重传传输成功率较先前提高百分比
   hcdi:
     originalPacket: 10  # 初始发包数
     timeToLive: 1000    # TTL
     cacheThreshold: 50  # 缓存阈值大小
-    nextPacket: 1      # 下一组发包数
+    nextPacket: 1       # 下一组发包数
+  lslrinc:
+    threshold: 50       # 编码阈值
+    timeToLive: 1000    # TTL

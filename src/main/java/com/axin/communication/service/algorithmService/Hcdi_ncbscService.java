@@ -2,6 +2,7 @@ package com.axin.communication.service.algorithmService;
 
 import com.axin.communication.algorithm.NcdiNcBhc;
 import com.axin.communication.domain.TaskResult;
+import com.axin.communication.service.ComputeSignalService;
 import com.axin.communication.service.ComputeTBService;
 import com.axin.communication.tools.common.NetworkCodeTools;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service("ncbscService")
-public class Hcdi_ncbscService implements ComputeTBService, InitializingBean {
+public class Hcdi_ncbscService implements ComputeTBService, ComputeSignalService, InitializingBean {
 
     /**
      * 初始发包数
@@ -47,6 +48,7 @@ public class Hcdi_ncbscService implements ComputeTBService, InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         log.info("ncbsc参数：（初始发包数：{}），（TTL：{}），（缓存阈值：{}），（下一组发包数：{}）", originalPacket, timeToLive, cacheThreshold, nextPacket);
+        log.info("promote为{}",promote);
     }
 
     @Override
@@ -63,6 +65,18 @@ public class Hcdi_ncbscService implements ComputeTBService, InitializingBean {
             bandWith += NetworkCodeTools.computeDivide(result.getReNumber() + packetNumber, packetNumber);
         }
         return NetworkCodeTools.computeDivide(bandWith, times);
+    }
+
+    @Override
+    public double computeSignalLoss(int number, int packetNumber, double packetLoss, int times) {
+        double signalLoss = 0;
+        TaskResult result;
+        for (int i = 0; i < times; i++) {
+            result = hcdiNcBsc.getBandWithAndDelay(number, packetNumber, packetLoss, originalPacket, timeToLive, cacheThreshold, nextPacket, promote);
+            signalLoss += result.getSignalLoss();
+        }
+        signalLoss = NetworkCodeTools.computeDivide(signalLoss, times);
+        return signalLoss;
     }
 
     @Value("${networkcode.hcdi.originalPacket}")
@@ -84,5 +98,4 @@ public class Hcdi_ncbscService implements ComputeTBService, InitializingBean {
     public void setNextPacket(int nextPacket) {
         this.nextPacket = nextPacket;
     }
-
 }

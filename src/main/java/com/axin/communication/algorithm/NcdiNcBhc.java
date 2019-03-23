@@ -164,8 +164,12 @@ public class NcdiNcBhc {
                 delayMPEM = NetworkCodeTools.creatDelayMPEM(numebr, packetNumber + nextPacket, packetLoss);
             }
         }
+        //统计性能指标
         delay = NetworkCodeTools.computeDivide(delay, lossPacket);
-        return new TaskResult(reNumber, delay, 0, cacheOverflow);
+        // 系统信令效率
+        double signalNumber = reNumber * numebr;
+        double signalLoss = NetworkCodeTools.computeDivide(lossPacket, signalNumber);
+        return new TaskResult(reNumber, delay, signalLoss, cacheOverflow);
     }
 
     /**
@@ -201,7 +205,7 @@ public class NcdiNcBhc {
     /**
      * 统计丢包个数
      */
-    public int computelossPacket(int[][] delayMPEM) {
+    private int computelossPacket(int[][] delayMPEM) {
         int res = 0;
         int row = delayMPEM.length;
         int col = delayMPEM[0].length;

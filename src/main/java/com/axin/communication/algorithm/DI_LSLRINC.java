@@ -101,8 +101,8 @@ public class DI_LSLRINC {
             delayMPEM = MatrixTools.jointMatrix(delayMPEM, nextPacket);
         }
         // 返回性能参数
-//        System.out.println("累计性能参数重传次数" + reNumber + " 累计信令：" + signalNumber + " 累计时延：" + delay);
         double aveDelay = NetworkCodeTools.computeDivide(delay, lossPacket);
+        // 丢失包/系统信令总数
         double aveSignalNumber = NetworkCodeTools.computeDivide(lossPacket, signalNumber);
         TaskResult result = new TaskResult();
         result.setReNumber(reNumber);
