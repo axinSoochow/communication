@@ -67,6 +67,14 @@ public class Hcdi_ncbscService implements ComputeTBService, ComputeSignalService
         return NetworkCodeTools.computeDivide(bandWith, times);
     }
 
+    /**
+     *  存在遗留问题
+     * @param number
+     * @param packetNumber
+     * @param packetLoss
+     * @param times
+     * @return
+     */
     @Override
     public double computeSignalLoss(int number, int packetNumber, double packetLoss, int times) {
         double signalLoss = 0;

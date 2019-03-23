@@ -34,7 +34,7 @@ public class ArqService implements ComputeTBService, ComputeSignalService {
         double signalLoss = 0;
         for (int i = 0; i < times; i++) {
             int[][] MPEM = NetworkCodeTools.creatMPEM(number, packetNumber, packetLoss);
-            signalLoss += getARQSignalLoss(MPEM);
+            signalLoss += getARQSignalLoss(MPEM,packetLoss);
         }
         return NetworkCodeTools.computeDivide(signalLoss, times);
     }
@@ -44,9 +44,9 @@ public class ArqService implements ComputeTBService, ComputeSignalService {
      * @param MPEM
      * @return
      */
-    private double getARQSignalLoss(int[][] MPEM) {
+    private double getARQSignalLoss(int[][] MPEM,double packetLoss) {
         //终端总信令消耗数
-        int signalNumber = computeLossPacketNumber(MPEM);
+        int signalNumber = computeLossPacketNumber(MPEM,packetLoss);
         //丢失包数
         int lossPacketNumber = computelossPacket(MPEM);
         return NetworkCodeTools.computeDivide(lossPacketNumber,signalNumber);
@@ -57,7 +57,7 @@ public class ArqService implements ComputeTBService, ComputeSignalService {
      * @param MPEM
      * @return
      */
-    private int computeLossPacketNumber(int[][] MPEM) {
+    private int computeLossPacketNumber(int[][] MPEM,double packetLoss) {
         int row = MPEM.length;
         int col = MPEM[0].length;
         int res = 0;
@@ -68,6 +68,7 @@ public class ArqService implements ComputeTBService, ComputeSignalService {
                 }
             }
         }
+        res = (int)(res * (1 + packetLoss));
         return res;
     }
 
