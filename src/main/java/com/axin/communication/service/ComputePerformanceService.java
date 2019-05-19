@@ -136,14 +136,14 @@ public class ComputePerformanceService {
             oncsb = oncsbService.computeTB(i, packetNumber, interval, packetLoss, times);
             oncsbData.add(oncsb);
             oncsbGData.add(NetworkCodeTools.computeGain(arq, oncsb));
-//            //4.oncmb
-//            oncmb = oncmbService.computeTB(i, packetNumber, interval, packetLoss, times);
-//            oncmbData.add(oncmb);
-//            oncmbGData.add(NetworkCodeTools.computeGain(arq, oncmb));
-//            //5.hwner
-//            hwner = hwnerService.computeTB(i, packetNumber, interval, packetLoss, times);
-//            hwnerData.add(hwner);
-//            hwnerGData.add(NetworkCodeTools.computeGain(arq, hwner));
+            //4.oncmb
+            oncmb = oncmbService.computeTB(i, packetNumber, interval, packetLoss, times);
+            oncmbData.add(oncmb);
+            oncmbGData.add(NetworkCodeTools.computeGain(arq, oncmb));
+            //5.hwner
+            hwner = hwnerService.computeTB(i, packetNumber, interval, packetLoss, times);
+            hwnerData.add(hwner);
+            hwnerGData.add(NetworkCodeTools.computeGain(arq, hwner));
             //6.hcdi-hencService
             henc = hencService.computeTB(i, packetNumber, interval, packetLoss, times);
             hencData.add(henc);
@@ -256,14 +256,14 @@ public class ComputePerformanceService {
             oncsb = oncsbService.computeTB(number, packetNumber, interval, packetLoss, times);
             oncsbData.add(oncsb);
             oncsbGData.add(NetworkCodeTools.computeGain(arq, oncsb));
-//            //4.oncmb
-//            oncmb = oncmbService.computeTB(number, packetNumber, interval, packetLoss, times);
-//            oncmbData.add(oncmb);
-//            oncmbGData.add(NetworkCodeTools.computeGain(arq, oncmb));
-//            //5.hwner
-//            hwner = hwnerService.computeTB(number, packetNumber, interval, packetLoss, times);
-//            hwnerData.add(hwner);
-//            hwnerGData.add(NetworkCodeTools.computeGain(arq, hwner));
+            //4.oncmb
+            oncmb = oncmbService.computeTB(number, packetNumber, interval, packetLoss, times);
+            oncmbData.add(oncmb);
+            oncmbGData.add(NetworkCodeTools.computeGain(arq, oncmb));
+            //5.hwner
+            hwner = hwnerService.computeTB(number, packetNumber, interval, packetLoss, times);
+            hwnerData.add(hwner);
+            hwnerGData.add(NetworkCodeTools.computeGain(arq, hwner));
             //6.hcdi-hencService
             henc = hencService.computeTB(number, packetNumber, interval, packetLoss, times);
             hencData.add(henc);
