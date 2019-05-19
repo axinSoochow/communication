@@ -50,7 +50,6 @@ public class AxinController {
         return "计算完毕！";
     }
 
-
     @RequestMapping("/ttl")
     public String computeTTL() {
         computePerformanceService.computePerformanceWithTTLChange(number, packetNumber, interval, packetLoss, times);
